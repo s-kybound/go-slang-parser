@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "description": "a parser for go",
   "main": "index.js",
-  "repository": "https://github.com/CS4215-AY2425-joy-kyriel/go-slang-parser.git",
+  "repository": "https://github.com/CS4215-AY2324S2-joy-kyriel/go-slang-parser.git",
   "author": "s-kybound <abadkyriel@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "pegjs": "^0.10.0",
+    "peggy": "^4.0.2",
     "ts-pegjs": "^4.2.1"
   },
   "devDependencies": {
