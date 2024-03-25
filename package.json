@@ -10,6 +10,9 @@
     "peggy": "^4.0.2",
     "ts-pegjs": "^4.2.1"
   },
+  "scripts": {
+    "generate-ast": "peggy --plugin ./node_modules/ts-pegjs/dist/tspegjs -o src/go_parser.ts"
+  },
   "devDependencies": {
     "@babel/preset-env": "^7.24.0",
     "@types/node": "^20.11.28",
