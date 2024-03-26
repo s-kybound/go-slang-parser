@@ -52,14 +52,14 @@
   }
   
   function makeDeclarations(id_list, val_list, decType, infer) {
-    if (val_list === null && !infer) {
+    if (val_list.length === 0 && !infer) {
       const dec_list = [];
       for (let i = 0; i < id_list.length; i++) {
-        dec_list[i] = makeDeclaration(id_list[i], getDefault(id_list.val_type), decType);
+        dec_list[i] = makeDeclaration(id_list[i], getDefault(id_list[i].val_type), decType);
       }
       return dec_list
     }
-    if (id_list.length !== val_list.length) {
+    if (id_list.length !== val_list.length) {       
             throw new Error("identifier list length must be equal to value list!");
     }
     
@@ -78,9 +78,9 @@
   
   function getDefault(type) {
           switch (type) {
-            case "number": return 0;
-            case "bool": return false;
-            case "string": return "";
+            case "number": return makeLiteral(0);
+            case "bool": return makeLiteral(false);
+            case "string": return makeLiteral("");
     }
   }
 
@@ -111,7 +111,7 @@
   function makeReturnStatement(expression) {
     return {
       type: "returnStatement",
-      expression: expression
+      expressions: expression
     }
   }
 
@@ -164,16 +164,19 @@ groupedDeclarationList
 
 standardDeclarationList
   = _ identifiers:typedIdentifierList _ vals:(_ "=" _ @valueList)? _ {
-    return makeDeclarations(identifiers, vals, "placeholder", false);
+    return makeDeclarations(identifiers, vals ? vals : [], "placeholder", false);
   }
 
 inferredTypeDeclaration
   = _ identifiers: identifierList _ ":=" _ vals: valueList _ {  
-          return makeDeclarations(identifiers, vals, "var", true);
+    return makeDeclarations(identifiers, vals, "var", true);
   }
 
 typedIdentifierList
-  = idList: identifierList spc type:Type {idList.forEach(id => {id.val_type = type}); return idList; }
+  = idList: identifierList spc type:Type {
+  idList.forEach(id => {id.val_type = type}); 
+ return idList; 
+  }
  
 identifierList
   = head:Identifier tail:(_ "," _ @Identifier)*  {return [head, ...tail]}
@@ -187,7 +190,9 @@ function
   }
 
 formalsList
-  = identifierList spc type:Type (_ "," _ identifierList spc Type)*
+  = head:typedIdentifierList tail:(_ "," _ @typedIdentifierList)* {
+    return [...head, ...tail.flat()];
+  }
 
 Identifier
   = !GoKeyword !Type head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
@@ -200,7 +205,7 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType
+  = BasicType / FunctionType / TupleType
   
 BasicType
   = "number" / "bool" / "string" {
@@ -215,6 +220,18 @@ TypeList
 
 FunctionType
   = _ "func" typeGroup:TupleType _ ret:Type? _ { return {type_type: "function", formals: typeGroup, ret: ret} }
+
+expression
+  = recursive_application / application 
+   / unop 
+   / binop
+   / nonApplicativeExpression
+
+nonApplicativeExpression
+  = function / Identifier / literal
+
+literal
+  = literal:(number / bool / string) { return makeLiteral(literal); }
 
 number
   = n:[0-9]+ { return makeInteger(n); }
@@ -234,31 +251,26 @@ application
   = operator:nonApplicativeExpression _ "(" _ operands:valueList? _ ")" { 
     return makeApplication(operator, operands ? operands : []); 
   }
+  
+new_application
+  = operator:nonApplicativeExpression
 
 unop
   = _ opcode:[-+!] _ expr:expression _ { return makeUnop(opcode, expr);}
 
-recursive_binop
-  = _ left:binop _ opcode:[\+\-\*\/] _ right:expression { return makeBinop(left, opcode, right); }
-
 binop
-  = _ left:nonApplicativeExpression _ opcode:[\+\-\*\/] _ right:expression _ { return makeBinop(left, opcode, right); }
-
-literal
-  = literal:(number / bool / string) { return makeLiteral(literal); }
-
-nonApplicativeExpression
-  = function / Identifier / literal
-
-expression
-  = nonApplicativeExpression
-   application / unop / recursive_binop / binop
+  = _ left:nonApplicativeExpression _ rest:(@[\+\-\*\/] _ @expression)+ _ { 
+  return rest.reduce(function(wish, curr) {
+     return makeBinop(wish, curr[0], curr[1]);
+  }, left)
+  return makeBinop(left, opcode, right); 
+  }
 
 expressionStatement
-  = _ expression _ ";" _ { return makeExpressionStatement(expression); }
+  = _ expression:expression _ ";" _ { return makeExpressionStatement(expression); }
 
 returnStatement
-  = _ "return" _ expression _ ";" _ { return makeReturnStatement(expression); }
+  = _ "return" _ expression:valueList _ ";" _ { return makeReturnStatement(expression); }
 
 statement
   = expressionStatement
