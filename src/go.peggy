@@ -101,6 +101,14 @@
       expressions: expression
     }
   }
+  
+  function makeAssignmentStatement(identifiers, values) {
+    return {
+      type: "assignmentStatement",
+      ids: identifiers,
+      vals: values
+    }
+  }
 
   function makeFunction(name, formals, retType, body) {
     return {
@@ -252,6 +260,11 @@ expression
    / Identifier
    / literal
 
+unaryOperatorValidExpressions
+  = function
+  / Identifier
+  / literal
+
 nonBinaryOperatorExpression
   = application
   / unop
@@ -285,14 +298,41 @@ application
     }, operator);
   }
 
-unop
-  = _ opcode:[-+!] expr:expression _ { return makeUnop(opcode, expr);}
-
 binop
-  = _ left:nonBinaryOperatorExpression _ rest:(@[\+\-\*\/] _ @expression)+ _ { 
+  = additive_binop / multiplicative_binop / logical_binop
+
+// the way this is ordered will freely give us left-associativity and operator precedence
+
+additive_binop
+  = _ left:multiplicative_binop _ rest:(@[\+\-] _ @expression)+ _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
+  }
+  / multiplicative_binop
+
+multiplicative_binop
+  = _ left:nonBinaryOperatorExpression _ rest:(@[\*\/] _ @expression)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / nonBinaryOperatorExpression
+
+logical_binop
+  = _ left:nonBinaryOperatorExpression _ rest:(@("&&" / "||") _ @expression)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / nonBinaryOperatorExpression
+
+unop // WIP
+  = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
+
+assignmentStatement
+  = _ identifiers:identifierList _ "=" _ values:valueList _ ";" _ {
+    return makeAssignmentStatement(identifiers, values);
   }
 
 expressionStatement
@@ -304,6 +344,7 @@ returnStatement
 statement
   = expressionStatement
   / returnStatement
+  / assignmentStatement
   / function
   / declaration
 
