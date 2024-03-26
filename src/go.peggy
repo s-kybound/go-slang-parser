@@ -18,7 +18,7 @@
     return {
       type: "literal",
       value: lit,
-      val_type: typeof lit
+      val_type: makeBasicType(typeof lit)
     }
   }
 
@@ -43,41 +43,28 @@
   }
   
   function makeDeclaration(id, val, decType) {
-          return {
+    return {
       type: "declaration",
       declaration_type: decType,
-      id: id,
-      val: val
+      ids: id,
+      vals: val
     };
   }
   
   function makeDeclarations(id_list, val_list, decType, infer) {
     if (val_list.length === 0 && !infer) {
-      const dec_list = [];
-      for (let i = 0; i < id_list.length; i++) {
-        dec_list[i] = makeDeclaration(id_list[i], getDefault(id_list[i].val_type), decType);
-      }
-      return dec_list
-    }
-    if (id_list.length !== val_list.length) {       
-            throw new Error("identifier list length must be equal to value list!");
+      return makeDeclaration(id_list, id_list.map(id => getDefault(id.val_type)), decType);
     }
     
     if (infer) {
-            for (let i = 0; i < id_list.length; i++) {
-                    id_list[i].val_type = val_list[i].val_type;
-            }
+      // take type from the values and assign to the identifiers
     }
-    
-    const dec_list = [];
-                for (let i = 0; i < id_list.length; i++) {
-                    dec_list[i] = makeDeclaration(id_list[i], val_list[i], decType)
-            }
-    return dec_list
+
+    return makeDeclaration(id_list, val_list, decType);
   }
   
   function getDefault(type) {
-          switch (type) {
+          switch (type.type_value) {
             case "number": return makeLiteral(0);
             case "bool": return makeLiteral(false);
             case "string": return makeLiteral("");
@@ -123,6 +110,38 @@
       retType: retType,
       body: body
     }
+  }
+  
+  function makeType(others) {
+    return {
+      type: "type",
+      ...others
+    }
+  }
+  
+  function makeBasicType(type) {
+    return makeType({
+      type_type: "basic",
+      type_value: type
+    })
+  }
+  
+  function makeTupleType(types) {
+    if (types.length === 1) {
+      return types[0];
+    }
+    return makeType({
+      type_type: "tuple",
+      type_values: types
+    })
+  }
+  
+  function makeFunctionType(formals, ret) {
+  	return makeType({
+      type_type: "function",
+      formal_values: formals,
+      return_value: ret
+    })
   }
 }}
 
@@ -208,27 +227,44 @@ Type "go type"
   = BasicType / FunctionType / TupleType
   
 BasicType
-  = "number" / "bool" / "string" {
-    return {type_type: "basic", name: text()}
+  = ("number" / "bool" / "string") {
+    return makeBasicType(text());
   }
 
 TupleType
-  = _ "(" _ types:TypeList _ ")" _ { return {type_type: "tuple", types: types} };
+  = _ "(" _ types:TypeList _ ")" _ { 
+    return makeTupleType(types);
+  }
 
 TypeList
   = _ head:Type tail:(_ "," _ @Type)* _ { return [head, ...tail] }
 
 FunctionType
-  = _ "func" typeGroup:TupleType _ ret:Type? _ { return {type_type: "function", formals: typeGroup, ret: ret} }
+  = _ "func" formals:TupleType _ ret:(@Type)? _ {
+    return makeFunctionType(formals, ret); 
+  }
 
 expression
-  = recursive_application / application 
+  = application 
    / unop 
    / binop
-   / nonApplicativeExpression
+   / function
+   / Identifier
+   / literal
+
+nonBinaryOperatorExpression
+  = application
+  / unop
+  / function
+  / Identifier
+  / literal
 
 nonApplicativeExpression
-  = function / Identifier / literal
+  = unop
+  // binop cannot evaluate into something callable
+  / function 
+  / Identifier 
+  / literal
 
 literal
   = literal:(number / bool / string) { return makeLiteral(literal); }
@@ -240,30 +276,23 @@ bool
   = b:("true" / "false") { return makeBoolean(b); }
 
 string
-  = s:("\"" [^"]* "\"") { return makeString(s); }
-
-recursive_application
-  = operator:application _ "(" _ operands:valueList? _ ")" { 
-    return makeApplication(operator, operands ? operands : []); 
-  }
+  = s:("\"" [^"]* "\"") { return makeString(text()); }
 
 application
-  = operator:nonApplicativeExpression _ "(" _ operands:valueList? _ ")" { 
-    return makeApplication(operator, operands ? operands : []); 
+  = _ operator:nonApplicativeExpression _ rest:("(" _ @valueList? _ ")" )+ _ {
+    return rest.reduce(function(wish, curr) {
+      return makeApplication(wish, curr ? curr : []); 
+    }, operator);
   }
-  
-new_application
-  = operator:nonApplicativeExpression
 
 unop
-  = _ opcode:[-+!] _ expr:expression _ { return makeUnop(opcode, expr);}
+  = _ opcode:[-+!] expr:expression _ { return makeUnop(opcode, expr);}
 
 binop
-  = _ left:nonApplicativeExpression _ rest:(@[\+\-\*\/] _ @expression)+ _ { 
-  return rest.reduce(function(wish, curr) {
-     return makeBinop(wish, curr[0], curr[1]);
-  }, left)
-  return makeBinop(left, opcode, right); 
+  = _ left:nonBinaryOperatorExpression _ rest:(@[\+\-\*\/] _ @expression)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
   }
 
 expressionStatement
@@ -279,10 +308,13 @@ statement
   / declaration
 
 spc "space"
-  = (BlockComment / LineComment / Whitespace)+
+  = filler+
 
 _ "whitespace or comment"
-  = (BlockComment / LineComment / Whitespace)*
+  = filler*
+
+filler
+  = (BlockComment / LineComment / Whitespace)
 
 LineComment
   = "//" [^\n]*
