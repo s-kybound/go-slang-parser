@@ -406,10 +406,10 @@ goStatement
   }
 
 statement
-  = e:(expressionStatement
-  / returnStatement
-  / assignmentStatement
-  / goStatement) _ ";" _ { return e; } // force semicolons
+  = _ e:(expressionStatement
+  	/ returnStatement
+  	/ assignmentStatement
+  	/ goStatement) _ ";" _ { return e; } // force semicolons
   / emptyStatement
   / ifStatement
   / forStatement
