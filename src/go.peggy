@@ -109,6 +109,16 @@
       vals: values
     }
   }
+   
+  function makeIfStatement(conditional, consequent, alternate, short) {
+  	return {
+      type: "ifStatement",
+      cond: conditional,
+      cons: consequent,
+      alt: alternate,
+      short: short
+    }
+  }
 
   function makeFunction(name, formals, retType, body) {
     return {
@@ -341,10 +351,33 @@ expressionStatement
 returnStatement
   = _ "return" _ expression:valueList _ ";" _ { return makeReturnStatement(expression); }
 
+ifStatement
+  = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
+  	return makeIfStatement(cond, cons, alt, short);
+    return {
+    	type: "ifStatement",
+        conditional: cond,
+        consequent: body,
+        shortStatement: short,
+        alternate: alt
+    }
+  }
+
+elseStatement
+  = _ "else" _ "{" _ body: statement* _ "}" _ {return body;}
+  / elseIfStatement
+
+elseIfStatement
+  = _ "else" spc elif:ifStatement _ {return elif;}
+
+forStatement
+  = "TODO"
+
 statement
   = expressionStatement
   / returnStatement
   / assignmentStatement
+  / ifStatement
   / function
   / declaration
 
