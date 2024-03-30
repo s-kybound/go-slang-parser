@@ -274,16 +274,21 @@ FunctionType
 
 expression
   = application 
-   / unop 
    / binop
+   / unop
    / function
    / Identifier
    / literal
 
 unaryOperatorValidExpressions
   = function
+  / factor
   / Identifier
   / literal
+
+factor
+  = "(" expr:(binop / unop) ")" { return expr; }
+  / nonBinaryOperatorExpression
 
 nonBinaryOperatorExpression
   = application
@@ -345,7 +350,7 @@ logical_binop
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
   }
-  / nonBinaryOperatorExpression
+  / factor
 
 unop // WIP
   = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
