@@ -221,10 +221,20 @@ identifierList
 valueList
   = head:expression tail:(_ "," _ @expression)* {return [head, ...tail]}
 
-function
-  = _ "func" spc name:Identifier _ "(" _ formals:formalsList? _ ")" _ retType:Type? _ "{" _ body:statement* _ "}" { 
+namedFunction
+  = _ "func" spc name:Identifier _ "(" _ formals:formalsList? _ ")" _ retType:Type? _ "{" _ body:statement* _ "}" _ { 
     return makeFunction(name, formals ? formals : [], retType, body);
   }
+
+anonymousFunction
+  = _ "func" _ "(" _ formals:formalsList? _ ")" _ retType:Type? _ "{" _ body:statement* _ "}" _ {
+  	return makeFunction(undefined, formals ? formals : [], retType, body);
+  }
+
+function
+  = namedFunction
+  / anonymousFunction
+
 
 formalsList
   = head:typedIdentifierList tail:(_ "," _ @typedIdentifierList)* {
@@ -341,15 +351,15 @@ unop // WIP
   = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
 
 assignmentStatement
-  = _ identifiers:identifierList _ "=" _ values:valueList _ ";" _ {
+  = _ identifiers:identifierList _ "=" _ values:valueList _ {
     return makeAssignmentStatement(identifiers, values);
   }
 
 expressionStatement
-  = _ expression:expression _ ";" _ { return makeExpressionStatement(expression); }
+  = _ expression:expression _ { return makeExpressionStatement(expression); }
 
 returnStatement
-  = _ "return" _ expression:valueList _ ";" _ { return makeReturnStatement(expression); }
+  = _ "return" _ expression:valueList _ { return makeReturnStatement(expression); }
 
 ifStatement
   = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
@@ -371,15 +381,37 @@ elseIfStatement
   = _ "else" spc elif:ifStatement _ {return elif;}
 
 forStatement
-  = "TODO"
+  = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:expressionStatement? _ "{" _ body:statement* _ "}" _ {
+  	return {
+      type: "forStatement",
+      init: init,
+      cond: cond,
+      post: post,
+      body: body
+    }
+  }
+
+goStatement
+  = _ "go" spc app:application _ {
+  	return {
+      type: "goStatement",
+      app: app
+    }
+  }
 
 statement
-  = expressionStatement
+  = e:(expressionStatement
   / returnStatement
   / assignmentStatement
+  / goStatement) _ ";" _ { return e; } // force semicolons
+  / emptyStatement
   / ifStatement
-  / function
+  / forStatement
+  / namedFunction
   / declaration
+
+emptyStatement
+  = _ ";" _ { return {type: "emptyStatement"}}
 
 spc "space"
   = filler+
