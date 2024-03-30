@@ -277,14 +277,15 @@ expression
    / binop
    / unop
    / function
-   / Identifier
    / literal
+   / Identifier
 
 unaryOperatorValidExpressions
-  = function
+  = application
+  / function
   / factor
-  / Identifier
   / literal
+  / Identifier
 
 factor
   = "(" expr:(binop / unop) ")" { return expr; }
