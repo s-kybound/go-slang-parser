@@ -238,7 +238,10 @@ function
 
 formalsList
   = head:typedIdentifierList tail:(_ "," _ @typedIdentifierList)* {
-    return [...head, ...tail.flat()];
+    // append the tails to the head
+    // flattten the tail - it is an array of arrays
+    const newTail = tail.map(t => t).flat();
+    return head.concat(newTail);
   }
 
 Identifier
