@@ -1,3 +1,21 @@
+import {
+  Program,
+  Identifier,
+  Literal,
+  Application,
+  Declaration,
+  UnOp,
+  BinOp,
+  ExpressionStatement,
+  ReturnStatement,
+  AssignmentStatement,
+  IfStatement,
+  ForStatement,
+  GoStatement,
+  FunctionNode,
+  GoNode,
+} from "./ast_types";
+
 // Type guard for Program
 function isProgram(node: any): node is Program {
   return node.type === "program";
@@ -71,7 +89,7 @@ function isFunctionNode(node: any): node is FunctionNode {
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
-function verifyNode(ast: any): void {
+export function verifyNode(ast: any) {
   if (isProgram(ast)) {
     ast.top_declarations.forEach(verifyNode);
   } else if (isDeclaration(ast)) {
