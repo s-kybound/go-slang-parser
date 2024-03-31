@@ -34,11 +34,11 @@
     return b === "true";
   }
   
-  function makeApplication(operand, operators) {
+  function makeApplication(operator, operands) {
   	return {
       type: "application",
-      operand: operand,
-      operators: operators,
+      operator: operator,
+      operands: operands,
     }
   }
   
@@ -117,6 +117,23 @@
       cons: consequent,
       alt: alternate,
       short: short
+    }
+  }
+
+  function makeForStatement(init, cond, post, body) {
+    return {
+      type: "forStatement",
+      init: init,
+      cond: cond,
+      post: post,
+      body: body
+    }
+  }
+
+  function makeGoStatement(app) {
+    return {
+      type: "goStatement",
+      app: app
     }
   }
 
@@ -373,13 +390,6 @@ returnStatement
 ifStatement
   = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
   	return makeIfStatement(cond, cons, alt, short);
-    return {
-    	type: "ifStatement",
-        conditional: cond,
-        consequent: body,
-        shortStatement: short,
-        alternate: alt
-    }
   }
 
 elseStatement
@@ -391,21 +401,12 @@ elseIfStatement
 
 forStatement
   = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:expressionStatement? _ "{" _ body:statement* _ "}" _ {
-  	return {
-      type: "forStatement",
-      init: init,
-      cond: cond,
-      post: post,
-      body: body
-    }
+  	return makeForStatement(init, cond, post, body);
   }
 
 goStatement
   = _ "go" spc app:application _ {
-  	return {
-      type: "goStatement",
-      app: app
-    }
+    return makeGoStatement(app);
   }
 
 statement
