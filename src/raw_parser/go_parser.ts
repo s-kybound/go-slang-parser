@@ -67,15 +67,15 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
   }
   
 // @ts-ignore
-  function makeApplication(operand, operators) {
+  function makeApplication(operator, operands) {
 // @ts-ignore
   	return {
 // @ts-ignore
       type: "application",
 // @ts-ignore
-      operand: operand,
+      operator: operator,
 // @ts-ignore
-      operators: operators,
+      operands: operands,
     }
   }
   
@@ -201,6 +201,34 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
       alt: alternate,
 // @ts-ignore
       short: short
+    }
+  }
+
+// @ts-ignore
+  function makeForStatement(init, cond, post, body) {
+// @ts-ignore
+    return {
+// @ts-ignore
+      type: "forStatement",
+// @ts-ignore
+      init: init,
+// @ts-ignore
+      cond: cond,
+// @ts-ignore
+      post: post,
+// @ts-ignore
+      body: body
+    }
+  }
+
+// @ts-ignore
+  function makeGoStatement(app) {
+// @ts-ignore
+    return {
+// @ts-ignore
+      type: "goStatement",
+// @ts-ignore
+      app: app
     }
   }
 
@@ -834,19 +862,6 @@ return [head, ...tail]};// @ts-ignore
   var peg$f31 = function(short, cond, cons, alt) {
 // @ts-ignore
   	return makeIfStatement(cond, cons, alt, short);
-// @ts-ignore
-    return {
-// @ts-ignore
-    	type: "ifStatement",
-// @ts-ignore
-        conditional: cond,
-// @ts-ignore
-        consequent: body,
-// @ts-ignore
-        shortStatement: short,
-// @ts-ignore
-        alternate: alt
-    }
   };// @ts-ignore
 
   var peg$f32 = function(body) {// @ts-ignore
@@ -857,28 +872,12 @@ return elif;};// @ts-ignore
 
   var peg$f34 = function(init, cond, post, body) {
 // @ts-ignore
-  	return {
-// @ts-ignore
-      type: "forStatement",
-// @ts-ignore
-      init: init,
-// @ts-ignore
-      cond: cond,
-// @ts-ignore
-      post: post,
-// @ts-ignore
-      body: body
-    }
+  	return makeForStatement(init, cond, post, body);
   };// @ts-ignore
 
   var peg$f35 = function(app) {
 // @ts-ignore
-  	return {
-// @ts-ignore
-      type: "goStatement",
-// @ts-ignore
-      app: app
-    }
+    return makeGoStatement(app);
   };// @ts-ignore
 
   var peg$f36 = function(e) {// @ts-ignore
@@ -6031,25 +6030,23 @@ export type Unop = { type: string; opcode: any; expr: any };
 export type AssignmentStatement = { type: string; ids: any; vals: any };
 export type ExpressionStatement = { type: string; expression: any };
 export type ReturnStatement = { type: string; expressions: any };
-export type IfStatement =
-  | { type: string; cond: any; cons: any; alt: any; short: any }
-  | {
-      type: "ifStatement";
-      conditional: Expression;
-      consequent: any;
-      shortStatement: Statement | null;
-      alternate: ElseStatement | null;
-    };
+export type IfStatement = {
+  type: string;
+  cond: any;
+  cons: any;
+  alt: any;
+  short: any;
+};
 export type ElseStatement = Statement[] | ElseIfStatement;
 export type ElseIfStatement = IfStatement;
 export type ForStatement = {
-  type: "forStatement";
-  init: Statement | null;
-  cond: Expression | null;
-  post: ExpressionStatement | null;
-  body: Statement[];
+  type: string;
+  init: any;
+  cond: any;
+  post: any;
+  body: any;
 };
-export type GoStatement = { type: "goStatement"; app: Application };
+export type GoStatement = { type: string; app: any };
 export type Statement =
   | (ExpressionStatement | ReturnStatement | AssignmentStatement | GoStatement)
   | EmptyStatement
