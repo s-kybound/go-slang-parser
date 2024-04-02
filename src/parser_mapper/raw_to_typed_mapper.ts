@@ -27,7 +27,7 @@ function isIdentifier(node: any): node is Identifier {
 }
 
 // Type guard for Literal
-function isLiteral(node: any): node is Literal<any> {
+function isLiteral(node: any): node is Literal {
   return node?.type === "literal";
 }
 

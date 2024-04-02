@@ -23,8 +23,8 @@ export class Identifier extends GoNode {
   }
 }
 
-export class Literal<T> extends GoNode {
-  constructor(public value: T, public val_type: Type) {
+export class Literal extends GoNode {
+  constructor(public value: any, public val_type: Type) {
     super("literal");
   }
 }
