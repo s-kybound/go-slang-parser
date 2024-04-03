@@ -72,7 +72,7 @@ export class AssignmentStatement extends GoNode {
 }
 
 export class IfStatement extends GoNode {
-  constructor(public cond: GoNode, public cons: GoNode[], public alt: GoNode[] | null, public short: boolean) {
+  constructor(public cond: GoNode, public cons: GoNode[], public alt: GoNode[] | null, public short: GoNode | null) {
     super("ifStatement");
   }
 }
