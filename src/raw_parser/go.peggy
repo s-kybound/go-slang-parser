@@ -200,7 +200,7 @@ declaration
 
 standardDeclaration
   = _ decType:declarationType spc declarations:declarationList _ {
-  	declarations.forEach(dec => dec.declaration_type = decType);
+  	declarations.declaration_type = decType;
           return declarations
   }
 

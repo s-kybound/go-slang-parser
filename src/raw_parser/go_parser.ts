@@ -719,7 +719,7 @@ return dec;};// @ts-ignore
 
   var peg$f3 = function(decType, declarations) {
 // @ts-ignore
-  	declarations.forEach(dec => dec.declaration_type = decType);
+  	declarations.declaration_type = decType;
 // @ts-ignore
           return declarations
   };// @ts-ignore

@@ -11,7 +11,7 @@
     "ts-pegjs": "^4.2.1"
   },
   "scripts": {
-    "generate-ast": "peggy --plugin ./node_modules/ts-pegjs/dist/tspegjs -o src/go_parser.ts"
+    "generate-ast": "peggy --plugin ./node_modules/ts-pegjs/dist/tspegjs -o src/raw_parser/go_parser.ts"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.24.0",
