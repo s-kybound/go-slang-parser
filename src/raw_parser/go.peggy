@@ -335,7 +335,7 @@ bool
   = b:("true" / "false") { return makeBoolean(b); }
 
 string
-  = s:("\"" [^"]* "\"") { return makeString(text()); }
+  = s:("\"" @[^"]* "\"") { return makeString(text()); }
 
 application
   = _ operator:nonApplicativeExpression _ rest:("(" _ @valueList? _ ")" )+ _ {
@@ -345,6 +345,22 @@ application
   }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
+
+logical_binop
+  = _ left: comparative_binop _ rest:(@("&&" / "||") _ @comparative_binop)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / comparative_binop
+
+comparative_binop
+  = _ left:additive_binop _ rest:(@("==" / "!=" / "<=" / ">=" / "<" / ">") _ @additive_binop)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / additive_binop
 
 additive_binop
   = _ left:multiplicative_binop _ rest:(@[\+\-] _ @multiplicative_binop)+ _ { 
@@ -362,16 +378,10 @@ multiplicative_binop
   }
   / factor
 
-logical_binop
-  = _ left:factor _ rest:(@("&&" / "||") _ @factor)+ _ { 
-    return rest.reduce(function(wish, curr) {
-      return makeBinop(wish, curr[0], curr[1]);
-    }, left)
-  }
-  / factor
+
 
 binop
-  = additive_binop / multiplicative_binop / logical_binop
+  = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
   = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
@@ -400,10 +410,9 @@ elseIfStatement
   = _ "else" spc elif:ifStatement _ {return elif;}
 
 forStatement
-  = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:expressionStatement? _ "{" _ body:statement* _ "}" _ {
+  = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:(assignmentStatement / expressionStatement)? _ "{" _ body:statement* _ "}" _ {
   	return makeForStatement(init, cond, post, body);
   }
-
 goStatement
   = _ "go" spc app:application _ {
     return makeGoStatement(app);
