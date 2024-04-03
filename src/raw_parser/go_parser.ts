@@ -5259,11 +5259,11 @@ peg$parsestatement() {
 // @ts-ignore
     s1 = peg$parse_();
 // @ts-ignore
-    s2 = peg$parseexpressionStatement();
+    s2 = peg$parsereturnStatement();
 // @ts-ignore
     if (s2 === peg$FAILED) {
 // @ts-ignore
-      s2 = peg$parsereturnStatement();
+      s2 = peg$parsegoStatement();
 // @ts-ignore
       if (s2 === peg$FAILED) {
 // @ts-ignore
@@ -5271,7 +5271,7 @@ peg$parsestatement() {
 // @ts-ignore
         if (s2 === peg$FAILED) {
 // @ts-ignore
-          s2 = peg$parsegoStatement();
+          s2 = peg$parseexpressionStatement();
         }
       }
     }
@@ -6048,7 +6048,7 @@ export type ForStatement = {
 };
 export type GoStatement = { type: string; app: any };
 export type Statement =
-  | (ExpressionStatement | ReturnStatement | AssignmentStatement | GoStatement)
+  | (ReturnStatement | GoStatement | AssignmentStatement | ExpressionStatement)
   | EmptyStatement
   | IfStatement
   | ForStatement
