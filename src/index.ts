@@ -1,20 +1,12 @@
-import { Program } from "estree"
-import { Tokenizer } from "./tokenizer"
-import { Parser } from "./parser2"
-import { Translator } from "./translator"
-import { Resolver } from "./resolver"
+import { parse as raw_parse } from './raw_parser/go_parser';
+import * as go_ast from './parser_mapper/ast_types';
+import { verifyNode } from './parser_mapper/raw_to_typed_mapper';
 
-export function parsePythonToEstreeAst(code: string,
-    variant: number = 1,
-    doValidate: boolean = false): Program {
-    const script = code + '\n'
-    const tokenizer = new Tokenizer(script)
-    const tokens = tokenizer.scanEverything()
-    const goParser = new Parser(script, tokens)
-    const ast = goParser.parse()
-    if (doValidate) {
-        new Resolver(script, ast).resolve(ast);
-    }
-    const translator = new Translator(script)
-    return translator.resolve(ast) as unknown as Program
+// given a program string, parse it into a typed AST.
+export function parse(raw: string): go_ast.GoNode {
+  const raw_ast = raw_parse(raw);
+  verifyNode(raw_ast);
+  // if the above line doesn't throw, we can safely cast the AST
+  // to the typed version.
+  return raw_ast as go_ast.GoNode;
 }

@@ -34,11 +34,11 @@
     return b === "true";
   }
   
-  function makeApplication(operand, operators) {
+  function makeApplication(operator, operands) {
   	return {
       type: "application",
-      operand: operand,
-      operators: operators,
+      operator: operator,
+      operands: operands,
     }
   }
   
@@ -120,6 +120,23 @@
     }
   }
 
+  function makeForStatement(init, cond, post, body) {
+    return {
+      type: "forStatement",
+      init: init,
+      cond: cond,
+      post: post,
+      body: body
+    }
+  }
+
+  function makeGoStatement(app) {
+    return {
+      type: "goStatement",
+      app: app
+    }
+  }
+
   function makeFunction(name, formals, retType, body) {
     return {
       type: "function",
@@ -183,7 +200,7 @@ declaration
 
 standardDeclaration
   = _ decType:declarationType spc declarations:declarationList _ {
-  	declarations.forEach(dec => dec.declaration_type = decType);
+  	declarations.declaration_type = decType;
           return declarations
   }
 
@@ -238,7 +255,10 @@ function
 
 formalsList
   = head:typedIdentifierList tail:(_ "," _ @typedIdentifierList)* {
-    return [...head, ...tail.flat()];
+    // append the tails to the head
+    // flattten the tail - it is an array of arrays
+    const newTail = tail.map(t => t).flat();
+    return head.concat(newTail);
   }
 
 Identifier
@@ -315,7 +335,7 @@ bool
   = b:("true" / "false") { return makeBoolean(b); }
 
 string
-  = s:("\"" [^"]* "\"") { return makeString(text()); }
+  = s:("\"" @[^"]* "\"") { return makeString(text()); }
 
 application
   = _ operator:nonApplicativeExpression _ rest:("(" _ @valueList? _ ")" )+ _ {
@@ -325,6 +345,22 @@ application
   }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
+
+logical_binop
+  = _ left: comparative_binop _ rest:(@("&&" / "||") _ @comparative_binop)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / comparative_binop
+
+comparative_binop
+  = _ left:additive_binop _ rest:(@("==" / "!=" / "<=" / ">=" / "<" / ">") _ @additive_binop)+ _ { 
+    return rest.reduce(function(wish, curr) {
+      return makeBinop(wish, curr[0], curr[1]);
+    }, left)
+  }
+  / additive_binop
 
 additive_binop
   = _ left:multiplicative_binop _ rest:(@[\+\-] _ @multiplicative_binop)+ _ { 
@@ -342,16 +378,10 @@ multiplicative_binop
   }
   / factor
 
-logical_binop
-  = _ left:factor _ rest:(@("&&" / "||") _ @factor)+ _ { 
-    return rest.reduce(function(wish, curr) {
-      return makeBinop(wish, curr[0], curr[1]);
-    }, left)
-  }
-  / factor
+
 
 binop
-  = additive_binop / multiplicative_binop / logical_binop
+  = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
   = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
@@ -370,13 +400,6 @@ returnStatement
 ifStatement
   = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
   	return makeIfStatement(cond, cons, alt, short);
-    return {
-    	type: "ifStatement",
-        conditional: cond,
-        consequent: body,
-        shortStatement: short,
-        alternate: alt
-    }
   }
 
 elseStatement
@@ -387,29 +410,19 @@ elseIfStatement
   = _ "else" spc elif:ifStatement _ {return elif;}
 
 forStatement
-  = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:expressionStatement? _ "{" _ body:statement* _ "}" _ {
-  	return {
-      type: "forStatement",
-      init: init,
-      cond: cond,
-      post: post,
-      body: body
-    }
+  = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:(assignmentStatement / expressionStatement)? _ "{" _ body:statement* _ "}" _ {
+  	return makeForStatement(init, cond, post, body);
   }
-
 goStatement
   = _ "go" spc app:application _ {
-  	return {
-      type: "goStatement",
-      app: app
-    }
+    return makeGoStatement(app);
   }
 
 statement
-  = _ e:(expressionStatement
-  	/ returnStatement
+  = _ e:(returnStatement
+    / goStatement
   	/ assignmentStatement
-  	/ goStatement) _ ";" _ { return e; } // force semicolons
+    / expressionStatement) _ ";" _ { return e; } // force semicolons
   / emptyStatement
   / ifStatement
   / forStatement
