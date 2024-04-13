@@ -202,6 +202,22 @@
       chan_value: chan_type
     })
   }
+  
+  function makeArrayType(size, arr_type) {
+  	return makeType({
+      type_type: "array",
+      size: parseInt(size.join(""), 10),
+      arr_type: arr_type,
+    })
+  }
+  
+  function makeSliceType(slc_type) {
+  	return makeType({
+      type_type: "slice",
+      slice_type: slc_type,
+    })
+  }
+  
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -296,7 +312,7 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType / TupleType / ChanType
+  = BasicType / FunctionType / TupleType / ChanType / ArrayType / SliceType
   
 BasicType
   = ("number" / "bool" / "string" / "Type") {
@@ -320,7 +336,16 @@ ChanType
   = _ chan:("chan"/"<-chan"/"chan<-") _ chanType:(@Type)? _ {
   	return makeChanType(chan, chanType);
   }
-  
+
+SliceType
+  = _ "[" _ "]" type:Type {
+    return makeSliceType(type)
+  }
+
+ArrayType
+  = _ "[" _ size:(@[0-9]+) _ "]" type:Type {
+  	return makeArrayType(size, type)
+  }
 expression
   = application 
    / binop
@@ -415,7 +440,7 @@ binop
   = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
-  = _ opcode:([-+!]/@"<-" _) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
+  = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
 
 assignmentStatement
   = _ identifiers:identifierList _ "=" _ values:valueList _ {
