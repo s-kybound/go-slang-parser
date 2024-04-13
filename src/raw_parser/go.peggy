@@ -109,7 +109,15 @@
       vals: values
     }
   }
-   
+  
+  function makeIndexAccess(val, index) {
+    return {
+      type: "indexAccess",
+      index: index,
+      accessed: val,
+    }
+  }
+  
   function makeIfStatement(conditional, consequent, alternate, short) {
   	return {
       type: "ifStatement",
@@ -131,6 +139,9 @@
   }
 
   function makeGoStatement(app) {
+  	if (app.type !== "application") {
+      throw new Error("go statement must be applied to an application!");
+    }
     return {
       type: "goStatement",
       app: app
@@ -217,7 +228,6 @@
       slice_type: slc_type,
     })
   }
-  
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -346,16 +356,48 @@ ArrayType
   = _ "[" _ size:(@[0-9]+) _ "]" type:Type {
   	return makeArrayType(size, type)
   }
+
+IndexExpression
+  = _ target:operableExpression _ 
+    rest:("["_ @[0-9]+ _"]")+ _ {
+    return rest.reduce(function(wish, curr) {
+      const accumulative = curr;
+      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+    }, target);  
+  }
+
+// specially for applications, because applications can also use types
+applicationValueList
+  = head:(expression/Type) tail:(_ "," _ @(expression/Type))* {return [head, ...tail]}
+
+applicationOrIndexExpression
+  = _ target:operableExpression _ 
+    rest:(@"["_ @[0-9]+ _"]" / @"(" _ @applicationValueList? _ ")" )+ _ {
+    return rest.reduce(function(wish, curr) {
+      const [type, accumulative] = curr;
+      if (type === "(") {
+      	return makeApplication(wish, accumulative ? accumulative : []);
+      }
+      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+    }, target);  
+  }
+
+operableExpression =
+   unop
+   / function
+   / literal
+   / Identifier
+
 expression
-  = application 
-   / binop
+  =  binop
    / unop
+   / applicationOrIndexExpression
    / function
    / literal
    / Identifier
 
 unaryOperatorValidExpressions
-  = application
+  = applicationOrIndexExpression
   / function
   / factor
   / literal
@@ -366,17 +408,10 @@ factor
   / nonBinaryOperatorExpression
 
 nonBinaryOperatorExpression
-  = application
+  = applicationOrIndexExpression
   / unop
   / function
   / Identifier
-  / literal
-
-nonApplicativeExpression
-  = unop
-  // binop cannot evaluate into something callable
-  / function 
-  / Identifier 
   / literal
 
 literal
@@ -390,17 +425,6 @@ bool
 
 string
   = s:("\"" @[^"]* "\"") { return makeString(text()); }
-
-// specially for applications, because applications can also use types
-applicationValueList
-  = head:(expression/Type) tail:(_ "," _ @(expression/Type))* {return [head, ...tail]}
-
-application
-  = _ operator:nonApplicativeExpression _ rest:("(" _ @applicationValueList? _ ")" )+ _ {
-    return rest.reduce(function(wish, curr) {
-      return makeApplication(wish, curr ? curr : []); 
-    }, operator);
-  }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
 
@@ -442,8 +466,11 @@ binop
 unop
   = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
 
+identifierOrIndexList
+  = head:(IndexExpression/Identifier) tail:(_ "," _ @(IndexExpression/Identifier))*  {return [head, ...tail]}
+
 assignmentStatement
-  = _ identifiers:identifierList _ "=" _ values:valueList _ {
+  = _ identifiers:identifierOrIndexList _ "=" _ values:valueList _ {
     return makeAssignmentStatement(identifiers, values);
   }
 
@@ -471,7 +498,8 @@ forStatement
   }
 
 goStatement
-  = _ "go" spc app:application _ {
+  = _ "go" spc app:applicationOrIndexExpression _ {
+    // TODO; find a way to assert application
     return makeGoStatement(app);
   }
 
