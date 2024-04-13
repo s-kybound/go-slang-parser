@@ -136,6 +136,14 @@
       app: app
     }
   }
+  
+  function makeSendStatement(chan, val) {
+    return {
+      type: "sendStatement",
+      chan: chan,
+      val: val,
+    }
+  }
 
   function makeFunction(name, formals, retType, body) {
     return {
@@ -150,6 +158,7 @@
   function makeType(others) {
     return {
       type: "type",
+      val_type: "Type",
       ...others
     }
   }
@@ -378,13 +387,11 @@ multiplicative_binop
   }
   / factor
 
-
-
 binop
   = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
-  = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
+  = _ opcode:([-+!]/@"<-" _) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
 
 assignmentStatement
   = _ identifiers:identifierList _ "=" _ values:valueList _ {
@@ -413,14 +420,21 @@ forStatement
   = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:(assignmentStatement / expressionStatement)? _ "{" _ body:statement* _ "}" _ {
   	return makeForStatement(init, cond, post, body);
   }
+
 goStatement
   = _ "go" spc app:application _ {
     return makeGoStatement(app);
   }
 
+sendStatement
+  = _ chan:expression _ "<-" _ val:expression _ {
+  	return makeSendStatement(chan, val);
+  }
+
 statement
   = _ e:(returnStatement
     / goStatement
+    / sendStatement
   	/ assignmentStatement
     / expressionStatement) _ ";" _ { return e; } // force semicolons
   / emptyStatement
