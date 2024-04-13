@@ -1,8 +1,8 @@
 // Base type definitions
-export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "goStatement" | "function" | "type";
+export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type";
 export type DeclarationType = "variable" | "constant";
 export type OpCode = string; // Define as needed
-export type BasicType = "number" | "bool" | "string";
+export type BasicType = "number" | "bool" | "string" | "Type";
 
 // Base class for all AST nodes
 export abstract class GoNode {
@@ -86,6 +86,18 @@ export class ForStatement extends GoNode {
 export class GoStatement extends GoNode {
   constructor(public app: Application) {
     super("goStatement");
+  }
+}
+
+export class SendStatement extends GoNode {
+  constructor(public chan: GoNode, public value: GoNode) {
+    super("sendStatement");
+  }
+}
+
+export class IndexAccess extends GoNode {
+  constructor(public accessed: GoNode, public index: GoNode) {
+    super("indexAccess");
   }
 }
 

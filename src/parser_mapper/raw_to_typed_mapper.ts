@@ -13,6 +13,8 @@ import {
   ForStatement,
   GoStatement,
   FunctionNode,
+  IndexAccess,
+  SendStatement,
   GoNode,
 } from "./ast_types";
 
@@ -86,6 +88,16 @@ function isFunctionNode(node: any): node is FunctionNode {
   return node?.type === "function";
 }
 
+// Type guard for IndexAccess
+function isIndexAccess(node: any): node is IndexAccess {
+  return node?.type === "indexAccess";
+}
+
+// Type guard for SendStatement
+function isSendStatement(node: any): node is SendStatement {
+  return node?.type === "sendStatement";
+}
+
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
@@ -141,6 +153,12 @@ export function verifyNode(ast: any) {
     verifyNode(ast.name)
     ast.formals.forEach(verifyNode)
     ast.body.forEach(verifyNode)
+  } else if (isIndexAccess(ast)) {
+    verifyNode(ast.accessed)
+    verifyNode(ast.index)
+  } else if (isSendStatement(ast)) {
+    verifyNode(ast.chan)
+    verifyNode(ast.value)
   } else if (ast?.type === "type") {
     // do nothing
   } else {
