@@ -187,6 +187,21 @@
       return_value: ret
     })
   }
+  
+  function makeChanType(chan_str, chan_type) {
+  	let send_receive = "generic";
+    if (chan_str === "<-chan") {
+    	send_receive = "receive";
+    } 
+    if (chan_str === "chan<-") {
+    	send_receive = "send";
+    }
+    return makeType({
+      type_type: "chan",
+      send_receive: send_receive,
+      chan_value: chan_type
+    })
+  }
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -281,10 +296,10 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType / TupleType
+  = BasicType / FunctionType / TupleType / ChanType
   
 BasicType
-  = ("number" / "bool" / "string") {
+  = ("number" / "bool" / "string" / "Type") {
     return makeBasicType(text());
   }
 
@@ -301,6 +316,11 @@ FunctionType
     return makeFunctionType(formals, ret); 
   }
 
+ChanType
+  = _ chan:("chan"/"<-chan"/"chan<-") _ chanType:(@Type)? _ {
+  	return makeChanType(chan, chanType);
+  }
+  
 expression
   = application 
    / binop
@@ -346,8 +366,12 @@ bool
 string
   = s:("\"" @[^"]* "\"") { return makeString(text()); }
 
+// specially for applications, because applications can also use types
+applicationValueList
+  = head:(expression/Type) tail:(_ "," _ @(expression/Type))* {return [head, ...tail]}
+
 application
-  = _ operator:nonApplicativeExpression _ rest:("(" _ @valueList? _ ")" )+ _ {
+  = _ operator:nonApplicativeExpression _ rest:("(" _ @applicationValueList? _ ")" )+ _ {
     return rest.reduce(function(wish, curr) {
       return makeApplication(wish, curr ? curr : []); 
     }, operator);
