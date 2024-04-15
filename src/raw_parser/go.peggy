@@ -228,6 +228,13 @@
       slice_type: slc_type,
     })
   }
+  
+  function makeStructType(elems) {
+  	return makeType({
+      type_type: "struct",
+      elems: elems,
+    })
+  }
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -322,7 +329,7 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType / TupleType / ChanType / ArrayType / SliceType
+  = BasicType / FunctionType / TupleType / ChanType / ArrayType / SliceType / StructType
   
 BasicType
   = ("number" / "bool" / "string" / "Type") {
@@ -355,6 +362,23 @@ SliceType
 ArrayType
   = _ "[" _ size:(@[0-9]+) _ "]" type:Type {
   	return makeArrayType(size, type)
+  }
+
+structElement
+  = _ name:Identifier spc type:Type _ {
+  	const elemName = name;
+    elemName.val_type = type;
+    return {
+    	type: "structElement",
+        name: elemName,
+    }
+  }
+
+StructType
+  = _ "struct" _ "{" 
+  _ structElems: (_ @structElement _ ";" _)* _
+  "}" _ {
+  	return makeStructType(structElems ? structElems : []);
   }
 
 IndexExpression
