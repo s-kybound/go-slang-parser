@@ -235,6 +235,21 @@
       elems: elems,
     })
   }
+  
+  function makeCustomType(custom) {
+  	return makeType({
+      type_type: "custom",
+      type_name: custom
+    })
+  }
+  
+  function makeTypeDeclaration(name, dec) {
+  	return {
+    	type: "typeDeclaration",
+        name: name,
+        dec: dec,
+    }
+  }
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -247,7 +262,7 @@
 // the top-level rule, expecting at least one function.
 
 start
-  = top_level_decs: (declaration / function)+ {
+  = top_level_decs: (declaration / function / typeDeclaration)* {
   	return makeProgram(top_level_decs.flat()); 
   }
 
@@ -329,7 +344,10 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType / TupleType / ChanType / ArrayType / SliceType / StructType
+  = InbuiltType
+
+InbuiltType "inbuilt go type"
+  = FunctionType / TupleType / ChanType / ArrayType / SliceType / StructType / BasicType
   
 BasicType
   = ("number" / "bool" / "string" / "Type") {
@@ -379,6 +397,11 @@ StructType
   _ structElems: (_ @structElement _ ";" _)* _
   "}" _ {
   	return makeStructType(structElems ? structElems : []);
+  }
+
+CustomType
+  = !GoKeyword !InbuiltType head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
+    return makeCustomType(head + tail.join("")); 
   }
 
 IndexExpression
@@ -532,6 +555,11 @@ sendStatement
   	return makeSendStatement(chan, val);
   }
 
+typeDeclaration
+  = _ "type" spc name:CustomType spc dec:Type _ ";" {
+  	return makeTypeDeclaration(name, dec);
+  }
+
 statement
   = _ e:(returnStatement
     / goStatement
@@ -543,6 +571,7 @@ statement
   / forStatement
   / namedFunction
   / declaration
+  / typeDeclaration
 
 emptyStatement
   = _ ";" _ { return {type: "emptyStatement"}}
