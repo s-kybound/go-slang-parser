@@ -108,49 +108,62 @@ export class FunctionNode extends GoNode {
 }
 
 // Type classes
-export class Type {
-  constructor(public type: "type", public type_details: any) {}
+export interface Type {
+  type: "type";
+  type_type: string;
 }
 
-export class BasicTypeClass extends Type {
-  constructor(public type_value: BasicType) {
-    super("type", { type_type: "basic", type_value });
-  }
+export class BasicTypeClass implements Type {
+  type: "type";
+  type_type: "basic";
+  constructor(public type_value: BasicType) {}
 }
 
-export class TupleType extends Type {
-  constructor(public type_values: Type[]) {
-    super("type", { type_type: "tuple", type_values });
-  }
+export class TupleType implements Type {
+  type: "type";
+  type_type: "tuple";
+  constructor(public type_values: Type[]) {}
 }
 
-export class FunctionType extends Type {
-  constructor(public formal_values: Type[], public return_value: Type) {
-    super("type", { type_type: "function", formal_values, return_value });
-  }
+export class FunctionType implements Type {
+  type: "type";
+  type_type: "function";
+  constructor(public formal_values: Type[], public return_value: Type) {}
 }
 
-export class ChanType extends Type {
-  constructor(public send_receive_type: string, public chan_value_type: Type) {
-    super("type", { type_type: "chan", send_receive_type, chan_value_type });
-  }
+export class ChanType implements Type {
+  type: "type";
+  type_type: "chan";
+  constructor(public send_receive_type: string, public chan_value_type: Type) {}
 }
-  
-export class CustomType extends Type {
-  constructor(public type_name: string) {
-    super("type", { type_type: "custom", type_name });
-  }
+
+export class ArrayType implements Type {
+  type: "type";
+  type_type: "array";
+  constructor(public arr_type: Type, public size: number) {}
+}
+
+export class SliceType implements Type {
+  type: "type";
+  type_type: "slice";
+  constructor(public slice_type: Type) {}
+}
+
+export class CustomType implements Type {
+  type: "type";
+  type_type: "custom";
+  constructor(public type_name: string) {}
+}
+
+export class StructType implements Type {
+  type: "type";
+  type_type: "struct";
+  constructor(public elems: StructElement[]) {}
 }
 
 export class StructElement extends GoNode {
   constructor(public name: Identifier) {
     super("structElement");
-  }
-}
-
-export class StructType extends Type {
-  constructor(public elems: StructElement[]) {
-    super("type", { type_type: "struct", elems });
   }
 }
 

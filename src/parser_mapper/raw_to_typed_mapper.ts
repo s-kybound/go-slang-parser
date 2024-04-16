@@ -19,6 +19,14 @@ import {
   StructFieldInstantiation,
   StructLiteral,
   StructAccess,
+  BasicTypeClass,
+  TupleType,
+  FunctionType,
+  ChanType,
+  SliceType,
+  ArrayType,
+  CustomType,
+  StructType,
   TypeDeclaration,
   GoNode,
 } from "./ast_types";
@@ -123,11 +131,46 @@ function isStructAccess(node: any): node is StructAccess {
   return node?.type === "structAccess";
 }
 
+function isBasicTypeClass(node: any): node is BasicTypeClass {
+  return node?.type === "type" && node?.type_type === "basic";
+}
+
+function isTupleType(node: any): node is TupleType {
+  return node?.type === "type" && node?.type_type === "tuple";
+}
+
+function isFunctionType(node: any): node is FunctionType {
+  return node?.type === "type" && node?.type_type === "function";
+}
+
+function isChanType(node: any): node is ChanType {
+  return node?.type === "type" && node?.type_type === "chan";
+}
+
+function isSliceType(node: any): node is SliceType {
+  return node?.type === "type" && node?.type_type === "slice";
+}
+
+function isArrayType(node: any): node is ArrayType {
+  return node?.type === "type" && node?.type_type === "array";
+}
+
+function isCustomType(node: any): node is CustomType {
+  return node?.type === "type" && node?.type_type === "custom";
+}
+
+function isStructType(node: any): node is StructType {
+  return node?.type === "type" && node?.type_type === "struct";
+}
+
+function isTypeDeclaration(node: any): node is TypeDeclaration {
+  return node?.type === "typeDeclaration";
+}
+
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
 export function verifyNode(ast: any) {
-  //console.log(ast);
   if (isProgram(ast)) {
     ast.top_declarations.forEach(verifyNode);
   } else if (isDeclaration(ast)) {
@@ -194,6 +237,26 @@ export function verifyNode(ast: any) {
     verifyNode(ast.expr)
   } else if (isStructElement(ast)) {
     verifyNode(ast.name)
+  } else if (isBasicTypeClass(ast)) {
+    // do nothing
+  } else if (isTupleType(ast)) {
+    ast.type_values.forEach(verifyNode)
+  } else if (isFunctionType(ast)) {
+    verifyNode(ast.return_value)
+    ast.formal_values.forEach(verifyNode)
+  } else if (isChanType(ast)) {
+    verifyNode(ast.chan_value_type)
+  } else if (isArrayType(ast)) {
+    verifyNode(ast.arr_type)
+  } else if (isSliceType(ast)) {
+    verifyNode(ast.slice_type)
+  } else if (isCustomType(ast)) {
+    // do nothing
+  } else if (isStructType(ast)) {
+    ast.elems.forEach(verifyNode)
+  } else if (isTypeDeclaration(ast)) {
+    verifyNode(ast.name)
+    verifyNode(ast.dec_type)
   } else {
     throw new Error(`Unknown node type: ${ast}`);
   }
