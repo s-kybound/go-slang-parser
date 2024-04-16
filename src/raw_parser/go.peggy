@@ -125,9 +125,10 @@
     }
   }
   
-  function makeStructAccess(field) {
+  function makeStructAccess(accessed, field) {
   	return {
       type: "structAccess",
+      accessed: accessed,
       field: field
     }
   }
@@ -239,8 +240,8 @@
     }
     return makeType({
       type_type: "chan",
-      send_receive: send_receive,
-      chan_value: chan_type
+      send_receive_type: send_receive,
+      chan_value_type: chan_type
     })
   }
   
@@ -277,7 +278,7 @@
   	return {
     	type: "typeDeclaration",
         name: name,
-        dec: dec,
+        dec_type: dec,
     }
   }
 }}
