@@ -404,6 +404,32 @@ CustomType
     return makeCustomType(head + tail.join("")); 
   }
 
+StructFieldInstantiation
+  = field:Identifier _ ":" _ ex:expression {
+  	return {
+    	type: "structFieldInstantiation",
+        field: field,
+        expr: ex
+    };
+  }
+
+StructFieldInstantiationList
+  = head:StructFieldInstantiation tail:(_ "," _ StructFieldInstantiation)* {
+  	return [head, ...tail];
+  }
+
+// StructLiterals in our implementation
+// must specify the names for the fields
+// ie Name: xxx
+StructLiteral
+  = _ type:(StructType/CustomType) _ "{" _ fields:StructFieldInstantiationList? _ "}" _ {
+  	return {
+    	type: "structLiteral",
+        val_type: type,
+        fields: fields ? fields : []
+    }
+  }
+
 IndexExpression
   = _ target:operableExpression _ 
     rest:("["_ @[0-9]+ _"]")+ _ {
@@ -429,6 +455,7 @@ applicationOrIndexExpression
     }, target);  
   }
 
+// something that can be applied or indexed together
 operableExpression =
    unop
    / function
@@ -440,26 +467,32 @@ expression
    / unop
    / applicationOrIndexExpression
    / function
+   / StructLiteral
    / literal
    / Identifier
 
+// something that can be applied to unary operators
 unaryOperatorValidExpressions
   = applicationOrIndexExpression
   / function
   / factor
+  / StructLiteral
   / literal
   / Identifier
 
+// an expression bounded by ()
 factor
   = "(" expr:(binop / unop) ")" { return expr; }
   / nonBinaryOperatorExpression
 
+// anything that can be applied to binary operators
 nonBinaryOperatorExpression
   = applicationOrIndexExpression
   / unop
   / function
-  / Identifier
+  / StructLiteral
   / literal
+  / Identifier
 
 literal
   = literal:(number / bool / string) { return makeLiteral(literal); }
