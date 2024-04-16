@@ -334,7 +334,7 @@ formalsList
   }
 
 Identifier
-  = !GoKeyword !Type head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
+  = !GoKeyword !InbuiltType head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
     return makeIdentifier(head + tail.join("")); 
   }
 
@@ -344,7 +344,7 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = InbuiltType
+  = InbuiltType / CustomType
 
 InbuiltType "inbuilt go type"
   = FunctionType / TupleType / ChanType / ArrayType / SliceType / StructType / BasicType
