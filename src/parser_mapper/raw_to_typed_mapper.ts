@@ -15,6 +15,11 @@ import {
   FunctionNode,
   IndexAccess,
   SendStatement,
+  StructElement,
+  StructFieldInstantiation,
+  StructLiteral,
+  StructAccess,
+  TypeDeclaration,
   GoNode,
 } from "./ast_types";
 
@@ -98,6 +103,26 @@ function isSendStatement(node: any): node is SendStatement {
   return node?.type === "sendStatement";
 }
 
+// Type guard for StructElement
+function isStructElement(node: any): node is StructElement {
+  return node?.type === "structElement";
+}
+
+// Type guard for StructFieldInstantiation
+function isStructFieldInstantiation(node: any): node is StructFieldInstantiation {
+  return node?.type === "structFieldInstantiation";
+}
+
+// Type guard for StructLiteral
+function isStructLiteral(node: any): node is StructLiteral {
+  return node?.type === "structLiteral";
+}
+
+// Type guard for StructAccess
+function isStructAccess(node: any): node is StructAccess {
+  return node?.type === "structAccess";
+}
+
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
@@ -158,9 +183,17 @@ export function verifyNode(ast: any) {
     verifyNode(ast.index)
   } else if (isSendStatement(ast)) {
     verifyNode(ast.chan)
-    verifyNode(ast.value)
-  } else if (ast?.type === "type") {
-    // do nothing
+    verifyNode(ast.value) 
+  } else if (isStructAccess(ast)) {
+    verifyNode(ast.accessed)
+    verifyNode(ast.field)
+  } else if (isStructLiteral(ast)) {
+    ast.fields.forEach(verifyNode)
+  } else if (isStructFieldInstantiation(ast)) {
+    verifyNode(ast.field)
+    verifyNode(ast.expr)
+  } else if (isStructElement(ast)) {
+    verifyNode(ast.name)
   } else {
     throw new Error(`Unknown node type: ${ast}`);
   }
