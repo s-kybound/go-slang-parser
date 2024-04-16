@@ -118,6 +118,36 @@
     }
   }
   
+  function makeStructElement(name) {
+  	return {
+    	type: "structElement",
+        name: name,
+    }
+  }
+  
+  function makeStructAccess(field) {
+  	return {
+      type: "structAccess",
+      field: field
+    }
+  }
+  
+  function makeStructFieldInstantiation(field, ex) {
+  	return {
+    	type: "structFieldInstantiation",
+        field: field,
+        expr: ex
+    }
+  }  
+  
+  function makeStructLiteral(type, fields) {
+  	return {
+    	type: "structLiteral",
+        val_type: type,
+        fields: fields
+    }
+  }
+  
   function makeIfStatement(conditional, consequent, alternate, short) {
   	return {
       type: "ifStatement",
@@ -386,10 +416,7 @@ structElement
   = _ name:Identifier spc type:Type _ {
   	const elemName = name;
     elemName.val_type = type;
-    return {
-    	type: "structElement",
-        name: elemName,
-    }
+    return makeStructElement(elemName)
   }
 
 StructType
@@ -406,11 +433,7 @@ CustomType
 
 StructFieldInstantiation
   = field:Identifier _ ":" _ ex:expression {
-  	return {
-    	type: "structFieldInstantiation",
-        field: field,
-        expr: ex
-    };
+  	return makeStructFieldInstantiation(field, ex);
   }
 
 StructFieldInstantiationList
@@ -423,11 +446,7 @@ StructFieldInstantiationList
 // ie Name: xxx
 StructLiteral
   = _ type:(StructType/CustomType) _ "{" _ fields:StructFieldInstantiationList? _ "}" _ {
-  	return {
-    	type: "structLiteral",
-        val_type: type,
-        fields: fields ? fields : []
-    }
+  	return makeStructLiteral(type, fields ? fields : [])
   }
 
 IndexExpression
@@ -438,18 +457,32 @@ IndexExpression
       return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
     }, target);  
   }
+  
+StructField
+  = _ target:operableExpression _ 
+    rest:("." @Identifier)+ _ {
+    return rest.reduce(function(wish, curr) {
+      return makeStructAccess(wish, curr);
+    }, target);  
+  }
 
 // specially for applications, because applications can also use types
 applicationValueList
   = head:(expression/Type) tail:(_ "," _ @(expression/Type))* {return [head, ...tail]}
 
-applicationOrIndexExpression
+applicationOrIndexOrAccessExpression
   = _ target:operableExpression _ 
-    rest:(@"["_ @[0-9]+ _"]" / @"(" _ @applicationValueList? _ ")" )+ _ {
+    rest:(
+    @"["_ @[0-9]+ _"]" 
+    / @"(" _ @applicationValueList? _ ")"
+    / @"." @Identifier)+ _ {
     return rest.reduce(function(wish, curr) {
       const [type, accumulative] = curr;
       if (type === "(") {
       	return makeApplication(wish, accumulative ? accumulative : []);
+      }
+      if (type === ".") {
+      	return makeStructAccess(wish, accumulative);
       }
       return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
     }, target);  
@@ -460,12 +493,13 @@ operableExpression =
    unop
    / function
    / literal
+   / StructLiteral
    / Identifier
 
 expression
   =  binop
    / unop
-   / applicationOrIndexExpression
+   / applicationOrIndexOrAccessExpression
    / function
    / StructLiteral
    / literal
@@ -473,7 +507,7 @@ expression
 
 // something that can be applied to unary operators
 unaryOperatorValidExpressions
-  = applicationOrIndexExpression
+  = applicationOrIndexOrAccessExpression
   / function
   / factor
   / StructLiteral
@@ -487,7 +521,7 @@ factor
 
 // anything that can be applied to binary operators
 nonBinaryOperatorExpression
-  = applicationOrIndexExpression
+  = applicationOrIndexOrAccessExpression
   / unop
   / function
   / StructLiteral
@@ -547,7 +581,7 @@ unop
   = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
 
 identifierOrIndexList
-  = head:(IndexExpression/Identifier) tail:(_ "," _ @(IndexExpression/Identifier))*  {return [head, ...tail]}
+  = head:(IndexExpression/StructField/Identifier) tail:(_ "," _ @(IndexExpression/Identifier))*  {return [head, ...tail]}
 
 assignmentStatement
   = _ identifiers:identifierOrIndexList _ "=" _ values:valueList _ {
@@ -578,7 +612,7 @@ forStatement
   }
 
 goStatement
-  = _ "go" spc app:applicationOrIndexExpression _ {
+  = _ "go" spc app:applicationOrIndexOrAccessExpression _ {
     // TODO; find a way to assert application
     return makeGoStatement(app);
   }
