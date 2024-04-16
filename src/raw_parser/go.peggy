@@ -429,7 +429,7 @@ structElement
 
 StructType
   = _ "struct" _ "{" 
-  _ structElems: (_ @structElement _ ";" _)* _
+  	_ structElems: (_ @structElement _ ";" _)* _
   "}" _ {
   	return makeStructType(structElems ? structElems : []);
   }
@@ -605,7 +605,7 @@ expressionStatement
   = _ expression:expression _ { return makeExpressionStatement(expression); }
 
 returnStatement
-  = _ "return" _ expression:valueList _ { return makeReturnStatement(expression); }
+  = _ "return" _ expression:valueList? _ { return makeReturnStatement(expression ? expression : []); }
 
 ifStatement
   = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
@@ -635,6 +635,51 @@ sendStatement
   	return makeSendStatement(chan, val);
   }
 
+receiveExpression
+  = _ "<-" _ chan:expression _ {
+  	return makeReceiveExpression(chan);
+  }
+
+receiveStatement
+  = _ identifiers: identifierList _ ":=" _ rval: receiveExpression _ {
+  	return makeDeclarations(identifiers, [rval], "var", true);
+  }
+  / _ vals: valueList _ "=" _ rval: receiveExpression _ {
+  	return makeAssignmentStatement(vals, [rval])
+  }
+  / _ rval: receiveExpression _ {
+  	return makeExpressionStatement(rval)
+  }
+  
+selectCaseHeader
+  = _ "case" spc s:(sendStatement/receiveStatement) _ ":" _ {
+  	return {
+    	type: "selectCase",
+        statement: s
+    }
+  }
+
+defaultCaseHeader
+  = _ "default" _ ":" _ {
+  	return {
+    	type: "defaultCase"
+    }
+  }
+
+selectBranch
+  = _ branch:(selectCaseHeader/defaultCaseHeader) body:(_ @statement _)* {
+  	branch.body = body ? body : []
+    return branch;
+  }
+
+selectStatement
+  = _ "select" _ "{" branches: (_ @selectBranch _)* "}" _ {
+  	return {
+    	type: "selectStatement",
+      cases: cases ? cases : []
+    }
+  }
+
 typeDeclaration
   = _ "type" spc name:CustomType spc dec:Type _ ";" {
   	return makeTypeDeclaration(name, dec);
@@ -649,6 +694,7 @@ statement
   / emptyStatement
   / ifStatement
   / forStatement
+  / selectStatement
   / namedFunction
   / declaration
   / typeDeclaration

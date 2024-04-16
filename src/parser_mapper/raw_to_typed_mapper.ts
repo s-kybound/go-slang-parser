@@ -12,6 +12,9 @@ import {
   IfStatement,
   ForStatement,
   GoStatement,
+  SelectStatement,
+  SelectCase,
+  DefaultCase,
   FunctionNode,
   IndexAccess,
   SendStatement,
@@ -173,6 +176,18 @@ function isTypeDeclaration(node: any): node is TypeDeclaration {
   return node?.type === "typeDeclaration";
 }
 
+function isSelectStatement(node: any): node is SelectStatement {
+  return node?.type === "selectStatement";
+}
+
+function isSelectCase(node: any): node is SelectCase {
+  return node?.type === "selectCase";
+}
+
+function isDefaultCase(node: any): node is DefaultCase {
+  return node?.type === "defaultCase";
+}
+
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
@@ -265,6 +280,13 @@ export function verifyNode(ast: any) {
   } else if (isTypeDeclaration(ast)) {
     verifyNode(ast.name)
     verifyNode(ast.dec_type)
+  } else if (isSelectStatement(ast)) {
+    ast.cases.forEach(verifyNode)
+  } else if (isSelectCase(ast)) {
+    verifyNode(ast.statement)
+    ast.body.forEach(verifyNode)
+  } else if (isDefaultCase(ast)) {
+    ast.body.forEach(verifyNode)
   } else {
     throw new Error(`Unknown node type: ${ast}`);
   }

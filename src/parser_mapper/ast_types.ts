@@ -1,5 +1,5 @@
 // Base type definitions
-export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression";
+export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression" | "selectStatement" | "selectCase" | "defaultCase";
 export type DeclarationType = "variable" | "constant";
 export type OpCode = string; // Define as needed
 export type BasicType = "number" | "bool" | "string" | "Type";
@@ -86,6 +86,24 @@ export class ForStatement extends GoNode {
 export class GoStatement extends GoNode {
   constructor(public app: Application) {
     super("goStatement");
+  }
+}
+
+export class SelectStatement extends GoNode {
+  constructor(public cases: (SelectCase | DefaultCase)[]) {
+    super("selectStatement");
+  }
+}
+
+export class SelectCase extends GoNode {
+  constructor(public statement: GoNode, public body: GoNode[]) {
+    super("selectCase");
+  }
+}
+
+export class DefaultCase extends GoNode {
+  constructor(public body: GoNode[]) {
+    super("defaultCase");
   }
 }
 

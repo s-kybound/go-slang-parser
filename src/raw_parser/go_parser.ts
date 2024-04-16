@@ -1165,7 +1165,7 @@ return [head, ...tail]};// @ts-ignore
  return makeExpressionStatement(expression); };// @ts-ignore
 
   var peg$f44 = function(expression) {// @ts-ignore
- return makeReturnStatement(expression); };// @ts-ignore
+ return makeReturnStatement(expression ? expression : []); };// @ts-ignore
 
   var peg$f45 = function(short, cond, cons, alt) {
 // @ts-ignore
@@ -1194,15 +1194,70 @@ return elif;};// @ts-ignore
   	return makeSendStatement(chan, val);
   };// @ts-ignore
 
-  var peg$f51 = function(name, dec) {
+  var peg$f51 = function(chan) {
+// @ts-ignore
+  	return makeReceiveExpression(chan);
+  };// @ts-ignore
+
+  var peg$f52 = function(identifiers, rval) {
+// @ts-ignore
+  	return makeDeclarations(identifiers, [rval], "var", true);
+  };// @ts-ignore
+
+  var peg$f53 = function(vals, rval) {
+// @ts-ignore
+  	return makeAssignmentStatement(vals, [rval])
+  };// @ts-ignore
+
+  var peg$f54 = function(rval) {
+// @ts-ignore
+  	return makeExpressionStatement(rval)
+  };// @ts-ignore
+
+  var peg$f55 = function(s) {
+// @ts-ignore
+  	return {
+// @ts-ignore
+    	type: "selectCase",
+// @ts-ignore
+        statement: s
+    }
+  };// @ts-ignore
+
+  var peg$f56 = function() {
+// @ts-ignore
+  	return {
+// @ts-ignore
+    	type: "defaultCase"
+    }
+  };// @ts-ignore
+
+  var peg$f57 = function(branch, body) {
+// @ts-ignore
+  	branch.body = body ? body : []
+// @ts-ignore
+    return branch;
+  };// @ts-ignore
+
+  var peg$f58 = function(branches) {
+// @ts-ignore
+  	return {
+// @ts-ignore
+    	type: "selectStatement",
+// @ts-ignore
+      cases: cases ? cases : []
+    }
+  };// @ts-ignore
+
+  var peg$f59 = function(name, dec) {
 // @ts-ignore
   	return makeTypeDeclaration(name, dec);
   };// @ts-ignore
 
-  var peg$f52 = function(e) {// @ts-ignore
+  var peg$f60 = function(e) {// @ts-ignore
  return e; };// @ts-ignore
 
-  var peg$f53 = function() {// @ts-ignore
+  var peg$f61 = function() {// @ts-ignore
  return {type: "emptyStatement"}};
 // @ts-ignore
   var peg$currPos = options.peg$currPos | 0;
@@ -7263,20 +7318,16 @@ peg$parsereturnStatement() {
 // @ts-ignore
       s4 = peg$parsevalueList();
 // @ts-ignore
-      if (s4 !== peg$FAILED) {
+      if (s4 === peg$FAILED) {
 // @ts-ignore
-        s5 = peg$parse_();
-// @ts-ignore
-        peg$savedPos = s0;
-// @ts-ignore
-        s0 = peg$f44(s4);
-// @ts-ignore
-      } else {
-// @ts-ignore
-        peg$currPos = s0;
-// @ts-ignore
-        s0 = peg$FAILED;
+        s4 = null;
       }
+// @ts-ignore
+      s5 = peg$parse_();
+// @ts-ignore
+      peg$savedPos = s0;
+// @ts-ignore
+      s0 = peg$f44(s4);
 // @ts-ignore
     } else {
 // @ts-ignore
@@ -7938,6 +7989,591 @@ peg$parsesendStatement() {
 
 // @ts-ignore
   function // @ts-ignore
+peg$parsereceiveExpression() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    if (input.substr(peg$currPos, 2) === peg$c52) {
+// @ts-ignore
+      s2 = peg$c52;
+// @ts-ignore
+      peg$currPos += 2;
+// @ts-ignore
+    } else {
+// @ts-ignore
+      s2 = peg$FAILED;
+// @ts-ignore
+      if (peg$silentFails === 0) { peg$fail(peg$e62); }
+    }
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = peg$parse_();
+// @ts-ignore
+      s4 = peg$parseexpression();
+// @ts-ignore
+      if (s4 !== peg$FAILED) {
+// @ts-ignore
+        s5 = peg$parse_();
+// @ts-ignore
+        peg$savedPos = s0;
+// @ts-ignore
+        s0 = peg$f51(s4);
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
+peg$parsereceiveStatement() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5, s6, s7;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    s2 = peg$parseidentifierList();
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = peg$parse_();
+// @ts-ignore
+      if (input.substr(peg$currPos, 2) === peg$c6) {
+// @ts-ignore
+        s4 = peg$c6;
+// @ts-ignore
+        peg$currPos += 2;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        s4 = peg$FAILED;
+// @ts-ignore
+        if (peg$silentFails === 0) { peg$fail(peg$e6); }
+      }
+// @ts-ignore
+      if (s4 !== peg$FAILED) {
+// @ts-ignore
+        s5 = peg$parse_();
+// @ts-ignore
+        s6 = peg$parsereceiveExpression();
+// @ts-ignore
+        if (s6 !== peg$FAILED) {
+// @ts-ignore
+          s7 = peg$parse_();
+// @ts-ignore
+          peg$savedPos = s0;
+// @ts-ignore
+          s0 = peg$f52(s2, s6);
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s0;
+// @ts-ignore
+          s0 = peg$FAILED;
+        }
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+// @ts-ignore
+    if (s0 === peg$FAILED) {
+// @ts-ignore
+      s0 = peg$currPos;
+// @ts-ignore
+      s1 = peg$parse_();
+// @ts-ignore
+      s2 = peg$parsevalueList();
+// @ts-ignore
+      if (s2 !== peg$FAILED) {
+// @ts-ignore
+        s3 = peg$parse_();
+// @ts-ignore
+        if (input.charCodeAt(peg$currPos) === 61) {
+// @ts-ignore
+          s4 = peg$c5;
+// @ts-ignore
+          peg$currPos++;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          s4 = peg$FAILED;
+// @ts-ignore
+          if (peg$silentFails === 0) { peg$fail(peg$e5); }
+        }
+// @ts-ignore
+        if (s4 !== peg$FAILED) {
+// @ts-ignore
+          s5 = peg$parse_();
+// @ts-ignore
+          s6 = peg$parsereceiveExpression();
+// @ts-ignore
+          if (s6 !== peg$FAILED) {
+// @ts-ignore
+            s7 = peg$parse_();
+// @ts-ignore
+            peg$savedPos = s0;
+// @ts-ignore
+            s0 = peg$f53(s2, s6);
+// @ts-ignore
+          } else {
+// @ts-ignore
+            peg$currPos = s0;
+// @ts-ignore
+            s0 = peg$FAILED;
+          }
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s0;
+// @ts-ignore
+          s0 = peg$FAILED;
+        }
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+      if (s0 === peg$FAILED) {
+// @ts-ignore
+        s0 = peg$currPos;
+// @ts-ignore
+        s1 = peg$parse_();
+// @ts-ignore
+        s2 = peg$parsereceiveExpression();
+// @ts-ignore
+        if (s2 !== peg$FAILED) {
+// @ts-ignore
+          s3 = peg$parse_();
+// @ts-ignore
+          peg$savedPos = s0;
+// @ts-ignore
+          s0 = peg$f54(s2);
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s0;
+// @ts-ignore
+          s0 = peg$FAILED;
+        }
+      }
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
+peg$parseselectCaseHeader() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5, s6, s7;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    if (input.substr(peg$currPos, 4) === peg$c12) {
+// @ts-ignore
+      s2 = peg$c12;
+// @ts-ignore
+      peg$currPos += 4;
+// @ts-ignore
+    } else {
+// @ts-ignore
+      s2 = peg$FAILED;
+// @ts-ignore
+      if (peg$silentFails === 0) { peg$fail(peg$e15); }
+    }
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = peg$parsespc();
+// @ts-ignore
+      if (s3 !== peg$FAILED) {
+// @ts-ignore
+        s4 = peg$parsesendStatement();
+// @ts-ignore
+        if (s4 === peg$FAILED) {
+// @ts-ignore
+          s4 = peg$parsereceiveStatement();
+        }
+// @ts-ignore
+        if (s4 !== peg$FAILED) {
+// @ts-ignore
+          s5 = peg$parse_();
+// @ts-ignore
+          if (input.charCodeAt(peg$currPos) === 58) {
+// @ts-ignore
+            s6 = peg$c41;
+// @ts-ignore
+            peg$currPos++;
+// @ts-ignore
+          } else {
+// @ts-ignore
+            s6 = peg$FAILED;
+// @ts-ignore
+            if (peg$silentFails === 0) { peg$fail(peg$e47); }
+          }
+// @ts-ignore
+          if (s6 !== peg$FAILED) {
+// @ts-ignore
+            s7 = peg$parse_();
+// @ts-ignore
+            peg$savedPos = s0;
+// @ts-ignore
+            s0 = peg$f55(s4);
+// @ts-ignore
+          } else {
+// @ts-ignore
+            peg$currPos = s0;
+// @ts-ignore
+            s0 = peg$FAILED;
+          }
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s0;
+// @ts-ignore
+          s0 = peg$FAILED;
+        }
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
+peg$parsedefaultCaseHeader() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    if (input.substr(peg$currPos, 7) === peg$c15) {
+// @ts-ignore
+      s2 = peg$c15;
+// @ts-ignore
+      peg$currPos += 7;
+// @ts-ignore
+    } else {
+// @ts-ignore
+      s2 = peg$FAILED;
+// @ts-ignore
+      if (peg$silentFails === 0) { peg$fail(peg$e18); }
+    }
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = peg$parse_();
+// @ts-ignore
+      if (input.charCodeAt(peg$currPos) === 58) {
+// @ts-ignore
+        s4 = peg$c41;
+// @ts-ignore
+        peg$currPos++;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        s4 = peg$FAILED;
+// @ts-ignore
+        if (peg$silentFails === 0) { peg$fail(peg$e47); }
+      }
+// @ts-ignore
+      if (s4 !== peg$FAILED) {
+// @ts-ignore
+        s5 = peg$parse_();
+// @ts-ignore
+        peg$savedPos = s0;
+// @ts-ignore
+        s0 = peg$f56();
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
+peg$parseselectBranch() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5, s6, s7;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    s2 = peg$parseselectCaseHeader();
+// @ts-ignore
+    if (s2 === peg$FAILED) {
+// @ts-ignore
+      s2 = peg$parsedefaultCaseHeader();
+    }
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = [];
+// @ts-ignore
+      s4 = peg$currPos;
+// @ts-ignore
+      s5 = peg$parse_();
+// @ts-ignore
+      s6 = peg$parsestatement();
+// @ts-ignore
+      if (s6 !== peg$FAILED) {
+// @ts-ignore
+        s7 = peg$parse_();
+// @ts-ignore
+        s4 = s6;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s4;
+// @ts-ignore
+        s4 = peg$FAILED;
+      }
+// @ts-ignore
+      while (s4 !== peg$FAILED) {
+// @ts-ignore
+        s3.push(s4);
+// @ts-ignore
+        s4 = peg$currPos;
+// @ts-ignore
+        s5 = peg$parse_();
+// @ts-ignore
+        s6 = peg$parsestatement();
+// @ts-ignore
+        if (s6 !== peg$FAILED) {
+// @ts-ignore
+          s7 = peg$parse_();
+// @ts-ignore
+          s4 = s6;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s4;
+// @ts-ignore
+          s4 = peg$FAILED;
+        }
+      }
+// @ts-ignore
+      peg$savedPos = s0;
+// @ts-ignore
+      s0 = peg$f57(s2, s3);
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
+peg$parseselectStatement() {
+// @ts-ignore
+    var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
+
+// @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
+    s1 = peg$parse_();
+// @ts-ignore
+    if (input.substr(peg$currPos, 6) === peg$c29) {
+// @ts-ignore
+      s2 = peg$c29;
+// @ts-ignore
+      peg$currPos += 6;
+// @ts-ignore
+    } else {
+// @ts-ignore
+      s2 = peg$FAILED;
+// @ts-ignore
+      if (peg$silentFails === 0) { peg$fail(peg$e32); }
+    }
+// @ts-ignore
+    if (s2 !== peg$FAILED) {
+// @ts-ignore
+      s3 = peg$parse_();
+// @ts-ignore
+      if (input.charCodeAt(peg$currPos) === 123) {
+// @ts-ignore
+        s4 = peg$c9;
+// @ts-ignore
+        peg$currPos++;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        s4 = peg$FAILED;
+// @ts-ignore
+        if (peg$silentFails === 0) { peg$fail(peg$e9); }
+      }
+// @ts-ignore
+      if (s4 !== peg$FAILED) {
+// @ts-ignore
+        s5 = [];
+// @ts-ignore
+        s6 = peg$currPos;
+// @ts-ignore
+        s7 = peg$parse_();
+// @ts-ignore
+        s8 = peg$parseselectBranch();
+// @ts-ignore
+        if (s8 !== peg$FAILED) {
+// @ts-ignore
+          s9 = peg$parse_();
+// @ts-ignore
+          s6 = s8;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s6;
+// @ts-ignore
+          s6 = peg$FAILED;
+        }
+// @ts-ignore
+        while (s6 !== peg$FAILED) {
+// @ts-ignore
+          s5.push(s6);
+// @ts-ignore
+          s6 = peg$currPos;
+// @ts-ignore
+          s7 = peg$parse_();
+// @ts-ignore
+          s8 = peg$parseselectBranch();
+// @ts-ignore
+          if (s8 !== peg$FAILED) {
+// @ts-ignore
+            s9 = peg$parse_();
+// @ts-ignore
+            s6 = s8;
+// @ts-ignore
+          } else {
+// @ts-ignore
+            peg$currPos = s6;
+// @ts-ignore
+            s6 = peg$FAILED;
+          }
+        }
+// @ts-ignore
+        if (input.charCodeAt(peg$currPos) === 125) {
+// @ts-ignore
+          s6 = peg$c10;
+// @ts-ignore
+          peg$currPos++;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          s6 = peg$FAILED;
+// @ts-ignore
+          if (peg$silentFails === 0) { peg$fail(peg$e10); }
+        }
+// @ts-ignore
+        if (s6 !== peg$FAILED) {
+// @ts-ignore
+          s7 = peg$parse_();
+// @ts-ignore
+          peg$savedPos = s0;
+// @ts-ignore
+          s0 = peg$f58(s5);
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s0;
+// @ts-ignore
+          s0 = peg$FAILED;
+        }
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
+
+// @ts-ignore
+    return s0;
+  }
+
+// @ts-ignore
+  function // @ts-ignore
 peg$parsetypeDeclaration() {
 // @ts-ignore
     var s0, s1, s2, s3, s4, s5, s6, s7, s8;
@@ -7997,7 +8633,7 @@ peg$parsetypeDeclaration() {
 // @ts-ignore
                 peg$savedPos = s0;
 // @ts-ignore
-                s0 = peg$f51(s4, s6);
+                s0 = peg$f59(s4, s6);
 // @ts-ignore
               } else {
 // @ts-ignore
@@ -8101,7 +8737,7 @@ peg$parsestatement() {
 // @ts-ignore
         peg$savedPos = s0;
 // @ts-ignore
-        s0 = peg$f52(s2);
+        s0 = peg$f60(s2);
 // @ts-ignore
       } else {
 // @ts-ignore
@@ -8131,15 +8767,20 @@ peg$parsestatement() {
 // @ts-ignore
           if (s0 === peg$FAILED) {
 // @ts-ignore
-            s0 = peg$parsenamedFunction();
+            s0 = peg$parseselectStatement();
 // @ts-ignore
             if (s0 === peg$FAILED) {
 // @ts-ignore
-              s0 = peg$parsedeclaration();
+              s0 = peg$parsenamedFunction();
 // @ts-ignore
               if (s0 === peg$FAILED) {
 // @ts-ignore
-                s0 = peg$parsetypeDeclaration();
+                s0 = peg$parsedeclaration();
+// @ts-ignore
+                if (s0 === peg$FAILED) {
+// @ts-ignore
+                  s0 = peg$parsetypeDeclaration();
+                }
               }
             }
           }
@@ -8181,7 +8822,7 @@ peg$parseemptyStatement() {
 // @ts-ignore
       peg$savedPos = s0;
 // @ts-ignore
-      s0 = peg$f53();
+      s0 = peg$f61();
 // @ts-ignore
     } else {
 // @ts-ignore
@@ -8900,6 +9541,18 @@ export type ForStatement = {
 };
 export type GoStatement = { type: string; app: any };
 export type SendStatement = { type: string; chan: any; val: any };
+export type ReceiveExpression = { type: string; chan: any };
+export type ReceiveStatement =
+  | { type: string; declaration_type: any; ids: any; vals: any }
+  | { type: string; ids: any; vals: any }
+  | { type: string; expression: any };
+export type SelectCaseHeader = {
+  type: "selectCase";
+  statement: SendStatement | ReceiveStatement;
+};
+export type DefaultCaseHeader = { type: "defaultCase" };
+export type SelectBranch = SelectCaseHeader | DefaultCaseHeader;
+export type SelectStatement = { type: "selectStatement"; cases: any };
 export type TypeDeclaration = { type: string; name: any; dec_type: any };
 export type Statement =
   | (
@@ -8912,6 +9565,7 @@ export type Statement =
   | EmptyStatement
   | IfStatement
   | ForStatement
+  | SelectStatement
   | NamedFunction
   | Declaration
   | TypeDeclaration;
