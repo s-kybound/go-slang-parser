@@ -1,8 +1,8 @@
 // Base type definitions
-export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "goStatement" | "function" | "type";
+export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression" | "selectStatement" | "selectCase" | "defaultCase";
 export type DeclarationType = "variable" | "constant";
 export type OpCode = string; // Define as needed
-export type BasicType = "number" | "bool" | "string";
+export type BasicType = "number" | "bool" | "string" | "Type";
 
 // Base class for all AST nodes
 export abstract class GoNode {
@@ -89,6 +89,42 @@ export class GoStatement extends GoNode {
   }
 }
 
+export class SelectStatement extends GoNode {
+  constructor(public cases: (SelectCase | DefaultCase)[]) {
+    super("selectStatement");
+  }
+}
+
+export class SelectCase extends GoNode {
+  constructor(public statement: GoNode, public body: GoNode[]) {
+    super("selectCase");
+  }
+}
+
+export class DefaultCase extends GoNode {
+  constructor(public body: GoNode[]) {
+    super("defaultCase");
+  }
+}
+
+export class SendStatement extends GoNode {
+  constructor(public chan: GoNode, public value: GoNode) {
+    super("sendStatement");
+  }
+}
+
+export class ReceiveExpression extends GoNode {
+  constructor(public chan: GoNode) {
+    super("receiveExpression");
+  }
+}
+
+export class IndexAccess extends GoNode {
+  constructor(public accessed: GoNode, public index: GoNode) {
+    super("indexAccess");
+  }
+}
+
 export class FunctionNode extends GoNode {
   constructor(public name: Identifier, public formals: Identifier[], public retType: Type, public body: GoNode[]) {
     super("function");
@@ -96,24 +132,85 @@ export class FunctionNode extends GoNode {
 }
 
 // Type classes
-export class Type {
-  constructor(public type: "type", public type_details: any) {}
+export interface Type {
+  type: "type";
+  type_type: string;
 }
 
-export class BasicTypeClass extends Type {
-  constructor(public type_value: BasicType) {
-    super("type", { type_type: "basic", type_value });
+export class BasicTypeClass implements Type {
+  type: "type";
+  type_type: "basic";
+  constructor(public type_value: BasicType) {}
+}
+
+export class TupleType implements Type {
+  type: "type";
+  type_type: "tuple";
+  constructor(public type_values: Type[]) {}
+}
+
+export class FunctionType implements Type {
+  type: "type";
+  type_type: "function";
+  constructor(public formal_values: Type[], public return_value: Type) {}
+}
+
+export class ChanType implements Type {
+  type: "type";
+  type_type: "chan";
+  constructor(public send_receive_type: string, public chan_value_type: Type) {}
+}
+
+export class ArrayType implements Type {
+  type: "type";
+  type_type: "array";
+  constructor(public arr_type: Type, public size: number) {}
+}
+
+export class SliceType implements Type {
+  type: "type";
+  type_type: "slice";
+  constructor(public slice_type: Type) {}
+}
+
+export class CustomType implements Type {
+  type: "type";
+  type_type: "custom";
+  constructor(public type_name: string) {}
+}
+
+export class StructType implements Type {
+  type: "type";
+  type_type: "struct";
+  constructor(public elems: StructElement[]) {}
+}
+
+export class StructElement extends GoNode {
+  constructor(public name: Identifier) {
+    super("structElement");
   }
 }
 
-export class TupleType extends Type {
-  constructor(public type_values: Type[]) {
-    super("type", { type_type: "tuple", type_values });
+export class StructFieldInstantiation extends GoNode {
+  constructor(public field: Identifier, public expr: GoNode) {
+    super("structFieldInstantiation");
   }
 }
 
-export class FunctionType extends Type {
-  constructor(public formal_values: Type[], public return_value: Type) {
-    super("type", { type_type: "function", formal_values, return_value });
+export class StructLiteral extends GoNode {
+  constructor(public val_type: Type, public fields: StructFieldInstantiation[]) {
+    super("structLiteral");
+  }
+}
+
+export class StructAccess extends GoNode {
+  constructor(public accessed: GoNode, public field: Identifier) {
+    super("structAccess");
+  }
+}
+
+export class TypeDeclaration extends GoNode {
+  constructor(public name: Identifier, public dec_type: Type) {
+    super("typeDeclaration");
   }
 }

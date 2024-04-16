@@ -109,7 +109,46 @@
       vals: values
     }
   }
-   
+  
+  function makeIndexAccess(val, index) {
+    return {
+      type: "indexAccess",
+      index: index,
+      accessed: val,
+    }
+  }
+  
+  function makeStructElement(name) {
+  	return {
+    	type: "structElement",
+        name: name,
+    }
+  }
+  
+  function makeStructAccess(accessed, field) {
+  	return {
+      type: "structAccess",
+      accessed: accessed,
+      field: field
+    }
+  }
+  
+  function makeStructFieldInstantiation(field, ex) {
+  	return {
+    	type: "structFieldInstantiation",
+        field: field,
+        expr: ex
+    }
+  }  
+  
+  function makeStructLiteral(type, fields) {
+  	return {
+    	type: "structLiteral",
+        val_type: type,
+        fields: fields
+    }
+  }
+  
   function makeIfStatement(conditional, consequent, alternate, short) {
   	return {
       type: "ifStatement",
@@ -131,9 +170,27 @@
   }
 
   function makeGoStatement(app) {
+  	if (app.type !== "application") {
+      throw new Error("go statement must be applied to an application!");
+    }
     return {
       type: "goStatement",
       app: app
+    }
+  }
+  
+  function makeSendStatement(chan, val) {
+    return {
+      type: "sendStatement",
+      chan: chan,
+      val: val,
+    }
+  }
+
+  function makeReceiveExpression(chan) {
+    return {
+      type: "receiveExpression",
+      chan: chan
     }
   }
 
@@ -150,6 +207,7 @@
   function makeType(others) {
     return {
       type: "type",
+      val_type: "Type",
       ...others
     }
   }
@@ -178,6 +236,58 @@
       return_value: ret
     })
   }
+  
+  function makeChanType(chan_str, chan_type) {
+  	let send_receive = "generic";
+    if (chan_str === "<-chan") {
+    	send_receive = "receive";
+    } 
+    if (chan_str === "chan<-") {
+    	send_receive = "send";
+    }
+    return makeType({
+      type_type: "chan",
+      send_receive_type: send_receive,
+      chan_value_type: chan_type
+    })
+  }
+  
+  function makeArrayType(size, arr_type) {
+  	return makeType({
+      type_type: "array",
+      size: parseInt(size.join(""), 10),
+      arr_type: arr_type,
+    })
+  }
+  
+  function makeSliceType(slc_type) {
+  	return makeType({
+      type_type: "slice",
+      slice_type: slc_type,
+    })
+  }
+  
+  function makeStructType(elems) {
+  	return makeType({
+      type_type: "struct",
+      elems: elems,
+    })
+  }
+  
+  function makeCustomType(custom) {
+  	return makeType({
+      type_type: "custom",
+      type_name: custom
+    })
+  }
+  
+  function makeTypeDeclaration(name, dec) {
+  	return {
+    	type: "typeDeclaration",
+        name: name,
+        dec_type: dec,
+    }
+  }
 }}
 
 // LIMITATIONS: This is a very simple parser for go.
@@ -190,7 +300,7 @@
 // the top-level rule, expecting at least one function.
 
 start
-  = top_level_decs: (declaration / function)+ {
+  = top_level_decs: (declaration / function / typeDeclaration)* {
   	return makeProgram(top_level_decs.flat()); 
   }
 
@@ -262,7 +372,7 @@ formalsList
   }
 
 Identifier
-  = !GoKeyword !Type head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
+  = !GoKeyword !InbuiltType head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
     return makeIdentifier(head + tail.join("")); 
   }
 
@@ -272,10 +382,13 @@ GoKeyword "reserved syntax keyword"
     / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
 
 Type "go type"
-  = BasicType / FunctionType / TupleType
+  = InbuiltType / CustomType
+
+InbuiltType "inbuilt go type"
+  = FunctionType / TupleType / ChanType / ArrayType / SliceType / StructType / BasicType
   
 BasicType
-  = ("number" / "bool" / "string") {
+  = ("number" / "bool" / "string" / "Type") {
     return makeBasicType(text());
   }
 
@@ -292,38 +405,136 @@ FunctionType
     return makeFunctionType(formals, ret); 
   }
 
-expression
-  = application 
-   / binop
-   / unop
+ChanType
+  = _ chan:("chan"/"<-chan"/"chan<-") _ chanType:(@Type)? _ {
+  	return makeChanType(chan, chanType);
+  }
+
+SliceType
+  = _ "[" _ "]" type:Type {
+    return makeSliceType(type)
+  }
+
+ArrayType
+  = _ "[" _ size:(@[0-9]+) _ "]" type:Type {
+  	return makeArrayType(size, type)
+  }
+
+structElement
+  = _ name:Identifier spc type:Type _ {
+  	const elemName = name;
+    elemName.val_type = type;
+    return makeStructElement(elemName)
+  }
+
+StructType
+  = _ "struct" _ "{" 
+  	_ structElems: (_ @structElement _ ";" _)* _
+  "}" _ {
+  	return makeStructType(structElems ? structElems : []);
+  }
+
+CustomType
+  = !GoKeyword !InbuiltType head:[a-zA-Z_] tail:[a-zA-Z0-9_]* { 
+    return makeCustomType(head + tail.join("")); 
+  }
+
+StructFieldInstantiation
+  = field:Identifier _ ":" _ ex:expression {
+  	return makeStructFieldInstantiation(field, ex);
+  }
+
+StructFieldInstantiationList
+  = head:StructFieldInstantiation tail:(_ "," _ StructFieldInstantiation)* {
+  	return [head, ...tail];
+  }
+
+// StructLiterals in our implementation
+// must specify the names for the fields
+// ie Name: xxx
+StructLiteral
+  = _ type:(StructType/CustomType) _ "{" _ fields:StructFieldInstantiationList? _ "}" _ {
+  	return makeStructLiteral(type, fields ? fields : [])
+  }
+
+IndexExpression
+  = _ target:operableExpression _ 
+    rest:("["_ @[0-9]+ _"]")+ _ {
+    return rest.reduce(function(wish, curr) {
+      const accumulative = curr;
+      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+    }, target);  
+  }
+  
+StructField
+  = _ target:operableExpression _ 
+    rest:("." @Identifier)+ _ {
+    return rest.reduce(function(wish, curr) {
+      return makeStructAccess(wish, curr);
+    }, target);  
+  }
+
+// specially for applications, because applications can also use types
+applicationValueList
+  = head:(expression/Type) tail:(_ "," _ @(expression/Type))* {return [head, ...tail]}
+
+applicationOrIndexOrAccessExpression
+  = _ target:operableExpression _ 
+    rest:(
+    @"["_ @[0-9]+ _"]" 
+    / @"(" _ @applicationValueList? _ ")"
+    / @"." @Identifier)+ _ {
+    return rest.reduce(function(wish, curr) {
+      const [type, accumulative] = curr;
+      if (type === "(") {
+      	return makeApplication(wish, accumulative ? accumulative : []);
+      }
+      if (type === ".") {
+      	return makeStructAccess(wish, accumulative);
+      }
+      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+    }, target);  
+  }
+
+// something that can be applied or indexed together
+operableExpression =
+   unop
    / function
+   / literal
+   / StructLiteral
+   / Identifier
+
+expression
+  =  binop
+   / unop
+   / applicationOrIndexOrAccessExpression
+   / function
+   / StructLiteral
    / literal
    / Identifier
 
+// something that can be applied to unary operators
 unaryOperatorValidExpressions
-  = application
+  = applicationOrIndexOrAccessExpression
   / function
   / factor
+  / StructLiteral
   / literal
   / Identifier
 
+// an expression bounded by ()
 factor
   = "(" expr:(binop / unop) ")" { return expr; }
   / nonBinaryOperatorExpression
 
+// anything that can be applied to binary operators
 nonBinaryOperatorExpression
-  = application
+  = applicationOrIndexOrAccessExpression
   / unop
   / function
+  / StructLiteral
+  / literal
   / Identifier
-  / literal
-
-nonApplicativeExpression
-  = unop
-  // binop cannot evaluate into something callable
-  / function 
-  / Identifier 
-  / literal
 
 literal
   = literal:(number / bool / string) { return makeLiteral(literal); }
@@ -336,13 +547,6 @@ bool
 
 string
   = s:("\"" @[^"]* "\"") { return makeString(text()); }
-
-application
-  = _ operator:nonApplicativeExpression _ rest:("(" _ @valueList? _ ")" )+ _ {
-    return rest.reduce(function(wish, curr) {
-      return makeApplication(wish, curr ? curr : []); 
-    }, operator);
-  }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
 
@@ -378,16 +582,22 @@ multiplicative_binop
   }
   / factor
 
-
-
 binop
   = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
-  = _ opcode:[-+!] expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
+  = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { 
+      if (opcode === "<-") {
+        return makeReceiveExpression(expr);
+      }
+      return makeUnop(opcode, expr);
+    }
+
+identifierOrIndexList
+  = head:(IndexExpression/StructField/Identifier) tail:(_ "," _ @(IndexExpression/Identifier))*  {return [head, ...tail]}
 
 assignmentStatement
-  = _ identifiers:identifierList _ "=" _ values:valueList _ {
+  = _ identifiers:identifierOrIndexList _ "=" _ values:valueList _ {
     return makeAssignmentStatement(identifiers, values);
   }
 
@@ -395,7 +605,7 @@ expressionStatement
   = _ expression:expression _ { return makeExpressionStatement(expression); }
 
 returnStatement
-  = _ "return" _ expression:valueList _ { return makeReturnStatement(expression); }
+  = _ "return" _ expression:valueList? _ { return makeReturnStatement(expression ? expression : []); }
 
 ifStatement
   = _ "if" spc short:(@statement)? _ cond:expression _ "{" _ cons:statement* _ "}" _ alt:(@elseStatement)? _ {
@@ -413,21 +623,81 @@ forStatement
   = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:(assignmentStatement / expressionStatement)? _ "{" _ body:statement* _ "}" _ {
   	return makeForStatement(init, cond, post, body);
   }
+
 goStatement
-  = _ "go" spc app:application _ {
+  = _ "go" spc app:applicationOrIndexOrAccessExpression _ {
+    // TODO; find a way to assert application
     return makeGoStatement(app);
+  }
+
+sendStatement
+  = _ chan:expression _ "<-" _ val:expression _ {
+  	return makeSendStatement(chan, val);
+  }
+
+receiveExpression
+  = _ "<-" _ chan:expression _ {
+  	return makeReceiveExpression(chan);
+  }
+
+receiveStatement
+  = _ identifiers: identifierList _ ":=" _ rval: receiveExpression _ {
+  	return makeDeclarations(identifiers, [rval], "var", true);
+  }
+  / _ vals: valueList _ "=" _ rval: receiveExpression _ {
+  	return makeAssignmentStatement(vals, [rval])
+  }
+  / _ rval: receiveExpression _ {
+  	return makeExpressionStatement(rval)
+  }
+  
+selectCaseHeader
+  = _ "case" spc s:(sendStatement/receiveStatement) _ ":" _ {
+  	return {
+    	type: "selectCase",
+        statement: s
+    }
+  }
+
+defaultCaseHeader
+  = _ "default" _ ":" _ {
+  	return {
+    	type: "defaultCase"
+    }
+  }
+
+selectBranch
+  = _ branch:(selectCaseHeader/defaultCaseHeader) body:(_ @statement _)* {
+  	branch.body = body ? body : []
+    return branch;
+  }
+
+selectStatement
+  = _ "select" _ "{" branches: (_ @selectBranch _)* "}" _ {
+  	return {
+    	type: "selectStatement",
+      cases: cases ? cases : []
+    }
+  }
+
+typeDeclaration
+  = _ "type" spc name:CustomType spc dec:Type _ ";" {
+  	return makeTypeDeclaration(name, dec);
   }
 
 statement
   = _ e:(returnStatement
     / goStatement
+    / sendStatement
   	/ assignmentStatement
     / expressionStatement) _ ";" _ { return e; } // force semicolons
   / emptyStatement
   / ifStatement
   / forStatement
+  / selectStatement
   / namedFunction
   / declaration
+  / typeDeclaration
 
 emptyStatement
   = _ ";" _ { return {type: "emptyStatement"}}
