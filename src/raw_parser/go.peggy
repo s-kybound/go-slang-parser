@@ -187,6 +187,13 @@
     }
   }
 
+  function makeReceiveExpression(chan) {
+    return {
+      type: "receiveExpression",
+      chan: chan
+    }
+  }
+
   function makeFunction(name, formals, retType, body) {
     return {
       type: "function",
@@ -579,7 +586,12 @@ binop
   = logical_binop / comparative_binop / additive_binop / multiplicative_binop
 
 unop
-  = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { return makeUnop(opcode, expr);}
+  = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { 
+      if (opcode === "<-") {
+        return makeReceiveExpression(expr);
+      }
+      return makeUnop(opcode, expr);
+    }
 
 identifierOrIndexList
   = head:(IndexExpression/StructField/Identifier) tail:(_ "," _ @(IndexExpression/Identifier))*  {return [head, ...tail]}

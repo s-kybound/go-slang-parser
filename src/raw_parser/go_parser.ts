@@ -314,6 +314,17 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
   }
 
 // @ts-ignore
+  function makeReceiveExpression(chan) {
+// @ts-ignore
+    return {
+// @ts-ignore
+      type: "receiveExpression",
+// @ts-ignore
+      chan: chan
+    }
+  }
+
+// @ts-ignore
   function makeFunction(name, formals, retType, body) {
 // @ts-ignore
     return {
@@ -1132,8 +1143,15 @@ return [head, ...tail]};// @ts-ignore
     }, left)
   };// @ts-ignore
 
-  var peg$f40 = function(opcode, expr) {// @ts-ignore
- return makeUnop(opcode, expr);};// @ts-ignore
+  var peg$f40 = function(opcode, expr) { 
+// @ts-ignore
+      if (opcode === "<-") {
+// @ts-ignore
+        return makeReceiveExpression(expr);
+      }
+// @ts-ignore
+      return makeUnop(opcode, expr);
+    };// @ts-ignore
 
   var peg$f41 = function(head, tail) {// @ts-ignore
 return [head, ...tail]};// @ts-ignore
@@ -8854,7 +8872,9 @@ export type Binop =
   | ComparativeBinop
   | AdditiveBinop
   | MultiplicativeBinop;
-export type Unop = { type: string; opcode: any; expr: any };
+export type Unop =
+  | { type: string; chan: any }
+  | { type: string; opcode: any; expr: any };
 export type IdentifierOrIndexList = [
   IndexExpression | StructField | Identifier,
   ...(IndexExpression | Identifier)[]

@@ -15,6 +15,7 @@ import {
   FunctionNode,
   IndexAccess,
   SendStatement,
+  ReceiveExpression,
   StructElement,
   StructFieldInstantiation,
   StructLiteral,
@@ -109,6 +110,11 @@ function isIndexAccess(node: any): node is IndexAccess {
 // Type guard for SendStatement
 function isSendStatement(node: any): node is SendStatement {
   return node?.type === "sendStatement";
+}
+
+// Type guard for ReceiveExpression
+function isReceiveExpression(node: any): node is ReceiveExpression {
+  return node?.type === "receiveExpression";
 }
 
 // Type guard for StructElement
@@ -227,6 +233,8 @@ export function verifyNode(ast: any) {
   } else if (isSendStatement(ast)) {
     verifyNode(ast.chan)
     verifyNode(ast.value) 
+  } else if (isReceiveExpression(ast)) {
+    verifyNode(ast.chan)
   } else if (isStructAccess(ast)) {
     verifyNode(ast.accessed)
     verifyNode(ast.field)

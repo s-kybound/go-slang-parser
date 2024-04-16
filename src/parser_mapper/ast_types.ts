@@ -1,5 +1,5 @@
 // Base type definitions
-export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration";
+export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression";
 export type DeclarationType = "variable" | "constant";
 export type OpCode = string; // Define as needed
 export type BasicType = "number" | "bool" | "string" | "Type";
@@ -92,6 +92,12 @@ export class GoStatement extends GoNode {
 export class SendStatement extends GoNode {
   constructor(public chan: GoNode, public value: GoNode) {
     super("sendStatement");
+  }
+}
+
+export class ReceiveExpression extends GoNode {
+  constructor(public chan: GoNode) {
+    super("receiveExpression");
   }
 }
 
