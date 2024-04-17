@@ -108,13 +108,13 @@ export class DefaultCase extends GoNode {
 }
 
 export class SendStatement extends GoNode {
-  constructor(public chan: GoNode, public value: GoNode) {
+  constructor(public chan: GoNode, public value: GoNode, public inSelect: boolean) {
     super("sendStatement");
   }
 }
 
 export class ReceiveExpression extends GoNode {
-  constructor(public chan: GoNode) {
+  constructor(public chan: GoNode, public inSelect: boolean) {
     super("receiveExpression");
   }
 }

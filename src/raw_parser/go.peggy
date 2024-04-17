@@ -184,13 +184,15 @@
       type: "sendStatement",
       chan: chan,
       val: val,
+      inSelect: false
     }
   }
 
   function makeReceiveExpression(chan) {
     return {
       type: "receiveExpression",
-      chan: chan
+      chan: chan,
+      inSelect: false
     }
   }
 
@@ -653,9 +655,11 @@ receiveStatement
   
 selectCaseHeader
   = _ "case" spc s:(sendStatement/receiveStatement) _ ":" _ {
-  	return {
+  	// set this flag to true
+    s.inSelect = true;
+    return {
     	type: "selectCase",
-        statement: s
+      statement: s
     }
   }
 

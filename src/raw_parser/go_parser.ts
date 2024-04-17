@@ -310,6 +310,8 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
       chan: chan,
 // @ts-ignore
       val: val,
+// @ts-ignore
+      inSelect: false
     }
   }
 
@@ -320,7 +322,9 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       type: "receiveExpression",
 // @ts-ignore
-      chan: chan
+      chan: chan,
+// @ts-ignore
+      inSelect: false
     }
   }
 
@@ -1215,12 +1219,15 @@ return elif;};// @ts-ignore
   };// @ts-ignore
 
   var peg$f55 = function(s) {
+  	// set this flag to true
 // @ts-ignore
-  	return {
+    s.inSelect = true;
+// @ts-ignore
+    return {
 // @ts-ignore
     	type: "selectCase",
 // @ts-ignore
-        statement: s
+      statement: s
     }
   };// @ts-ignore
 
@@ -9514,7 +9521,7 @@ export type Binop =
   | AdditiveBinop
   | MultiplicativeBinop;
 export type Unop =
-  | { type: string; chan: any }
+  | { type: string; chan: any; inSelect: boolean }
   | { type: string; opcode: any; expr: any };
 export type IdentifierOrIndexList = [
   IndexExpression | StructField | Identifier,
@@ -9540,8 +9547,13 @@ export type ForStatement = {
   body: any;
 };
 export type GoStatement = { type: string; app: any };
-export type SendStatement = { type: string; chan: any; val: any };
-export type ReceiveExpression = { type: string; chan: any };
+export type SendStatement = {
+  type: string;
+  chan: any;
+  val: any;
+  inSelect: boolean;
+};
+export type ReceiveExpression = { type: string; chan: any; inSelect: boolean };
 export type ReceiveStatement =
   | { type: string; declaration_type: any; ids: any; vals: any }
   | { type: string; ids: any; vals: any }
