@@ -1,5 +1,5 @@
 // Base type definitions
-export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression" | "selectStatement" | "selectCase" | "defaultCase";
+export type NodeType = "program" | "identifier" | "literal" | "application" | "declaration" | "unop" | "binop" | "expressionStatement" | "returnStatement" | "assignmentStatement" | "ifStatement" | "forStatement" | "indexAccess" | "sendStatement" | "goStatement" | "function" | "type" | "structElement" | "structLiteral" | "structFieldInstantiation" | "structAccess" | "typeDeclaration" | "receiveExpression" | "selectStatement" | "selectCase" | "defaultCase" | "emptyStatement";
 export type DeclarationType = "variable" | "constant";
 export type OpCode = string; // Define as needed
 export type BasicType = "number" | "bool" | "string" | "Type";
@@ -128,6 +128,12 @@ export class IndexAccess extends GoNode {
 export class FunctionNode extends GoNode {
   constructor(public name: Identifier, public formals: Identifier[], public retType: Type, public body: GoNode[]) {
     super("function");
+  }
+}
+
+export class EmptyStatement extends GoNode {
+  constructor() {
+    super("emptyStatement");
   }
 }
 

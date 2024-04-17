@@ -656,7 +656,15 @@ receiveStatement
 selectCaseHeader
   = _ "case" spc s:(sendStatement/receiveStatement) _ ":" _ {
   	// set this flag to true
-    s.inSelect = true;
+    if (s.type === "sendStatement") {
+    	s.inSelect = true;
+    } else if (s.type === "expressionStatement") {
+      s.expression.inSelect = true;
+    } else if (s.type === "declaration") {
+      s.vals[0].inSelect = true;
+    } else if (s.type === "assignmentStatement") {
+      s.vals[0].inSelect = true;
+    }
     return {
     	type: "selectCase",
       statement: s
@@ -677,7 +685,7 @@ selectBranch
   }
 
 selectStatement
-  = _ "select" _ "{" branches: (_ @selectBranch _)* "}" _ {
+  = _ "select" _ "{" cases: (_ @selectBranch _)* "}" _ {
   	return {
     	type: "selectStatement",
       cases: cases ? cases : []

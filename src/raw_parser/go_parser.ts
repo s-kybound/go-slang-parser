@@ -1221,7 +1221,22 @@ return elif;};// @ts-ignore
   var peg$f55 = function(s) {
   	// set this flag to true
 // @ts-ignore
-    s.inSelect = true;
+    if (s.type === "sendStatement") {
+// @ts-ignore
+    	s.inSelect = true;
+// @ts-ignore
+    } else if (s.type === "expressionStatement") {
+// @ts-ignore
+      s.expression.inSelect = true;
+// @ts-ignore
+    } else if (s.type === "declaration") {
+// @ts-ignore
+      s.vals[0].inSelect = true;
+// @ts-ignore
+    } else if (s.type === "assignmentStatement") {
+// @ts-ignore
+      s.vals[0].inSelect = true;
+    }
 // @ts-ignore
     return {
 // @ts-ignore
@@ -1246,7 +1261,7 @@ return elif;};// @ts-ignore
     return branch;
   };// @ts-ignore
 
-  var peg$f58 = function(branches) {
+  var peg$f58 = function(cases) {
 // @ts-ignore
   	return {
 // @ts-ignore
@@ -9564,7 +9579,10 @@ export type SelectCaseHeader = {
 };
 export type DefaultCaseHeader = { type: "defaultCase" };
 export type SelectBranch = SelectCaseHeader | DefaultCaseHeader;
-export type SelectStatement = { type: "selectStatement"; cases: any };
+export type SelectStatement = {
+  type: "selectStatement";
+  cases: SelectBranch[] | never[];
+};
 export type TypeDeclaration = { type: string; name: any; dec_type: any };
 export type Statement =
   | (
