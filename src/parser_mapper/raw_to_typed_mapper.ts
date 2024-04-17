@@ -239,7 +239,9 @@ export function verifyNode(ast: any) {
   } else if (isGoStatement(ast)) {
     verifyNode(ast.app)
   } else if (isFunctionNode(ast)) {
-    verifyNode(ast.name)
+    if (ast.name) {
+      verifyNode(ast.name)
+    }
     ast.formals.forEach(verifyNode)
     ast.body.forEach(verifyNode)
   } else if (isIndexAccess(ast)) {
@@ -247,7 +249,7 @@ export function verifyNode(ast: any) {
     verifyNode(ast.index)
   } else if (isSendStatement(ast)) {
     verifyNode(ast.chan)
-    verifyNode(ast.value) 
+    verifyNode(ast.val) 
   } else if (isReceiveExpression(ast)) {
     verifyNode(ast.chan)
   } else if (isStructAccess(ast)) {
