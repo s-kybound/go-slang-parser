@@ -132,17 +132,26 @@ export class FunctionNode extends GoNode {
 }
 
 // Type classes
-export interface Type {
-  type: "type";
+export abstract class Type {
+  type: string;
   type_type: string;
 
-  isSameType(type: Type): boolean;
+  constructor(type_type: string) {
+    this.type = 'type';
+    this.type_type = type_type;
+  }
+
+  abstract isSameType(type: Type): boolean;
+
+  getTypeName(): string {
+    return this.type_type;
+  }
 }
 
-export class BasicTypeClass implements Type {
-  type: "type";
-  type_type: "basic";
-  constructor(public type_value: BasicType) {}
+export class BasicTypeClass extends Type {
+  constructor(public type_value: BasicType) {
+    super('basic')
+  }
 
   isSameType(type: Type) {
     if (type instanceof BasicTypeClass) {
@@ -150,12 +159,16 @@ export class BasicTypeClass implements Type {
     }
     return false;
   }
+
+  getTypeName(): string {
+    return this.type_value;
+  }
 }
 
-export class TupleType implements Type {
-  type: "type";
-  type_type: "tuple";
-  constructor(public type_values: Type[]) {}
+export class TupleType extends Type {
+  constructor(public type_values: Type[]) {
+    super('tuple');
+  }
   
   isSameType(type: Type) {
     if (type instanceof TupleType) {
@@ -169,10 +182,10 @@ export class TupleType implements Type {
   }
 }
 
-export class FunctionType implements Type {
-  type: "type";
-  type_type: "function";
-  constructor(public formal_values: Type[], public return_value: Type) {}
+export class FunctionType extends Type {
+  constructor(public formal_values: Type[], public return_value: Type) {
+    super('function');
+  }
   
   // TODO: Make this more specific
   isSameType(type: Type) {
@@ -180,10 +193,10 @@ export class FunctionType implements Type {
   }
 }
 
-export class ChanType implements Type {
-  type: "type";
-  type_type: "chan";
-  constructor(public send_receive_type: string, public chan_value_type: Type) {}
+export class ChanType extends Type {
+  constructor(public send_receive_type: string, public chan_value_type: Type) {
+    super('chan');
+  }
 
   // TODO: Make this more specific
   isSameType(type: Type) {
@@ -191,10 +204,10 @@ export class ChanType implements Type {
   }
 }
 
-export class ArrayType implements Type {
-  type: "type";
-  type_type: "array";
-  constructor(public arr_type: Type, public size: number) {}
+export class ArrayType extends Type {
+  constructor(public arr_type: Type, public size: number) {
+    super('array');
+  }
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
@@ -202,10 +215,10 @@ export class ArrayType implements Type {
   }
 }
 
-export class SliceType implements Type {
-  type: "type";
-  type_type: "slice";
-  constructor(public slice_type: Type) {}
+export class SliceType extends Type {
+  constructor(public slice_type: Type) {
+    super('slice');
+  }
   
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
@@ -213,10 +226,10 @@ export class SliceType implements Type {
   }
 }
 
-export class CustomType implements Type {
-  type: "type";
-  type_type: "custom";
-  constructor(public type_name: string) {}
+export class CustomType extends Type {
+  constructor(public type_name: string) {
+    super('custom')
+  }
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
@@ -224,10 +237,10 @@ export class CustomType implements Type {
   }
 }
 
-export class StructType implements Type {
-  type: "type";
-  type_type: "struct";
-  constructor(public elems: StructElement[]) {}
+export class StructType extends Type {
+  constructor(public elems: StructElement[]) {
+    super('struct');
+  }
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
