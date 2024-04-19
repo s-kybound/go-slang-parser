@@ -1058,7 +1058,7 @@ return [head, ...tail]};// @ts-ignore
 // @ts-ignore
       const accumulative = curr;
 // @ts-ignore
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore
@@ -1091,7 +1091,7 @@ return [head, ...tail]};// @ts-ignore
       	return makeStructAccess(wish, accumulative);
       }
 // @ts-ignore
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore

@@ -66,7 +66,7 @@ export class ReturnStatement extends GoNode {
 }
 
 export class AssignmentStatement extends GoNode {
-  constructor(public ids: Identifier[], public vals: GoNode[]) {
+  constructor(public ids: (Identifier | IndexAccess)[], public vals: GoNode[]) {
     super("assignmentStatement");
   }
 }

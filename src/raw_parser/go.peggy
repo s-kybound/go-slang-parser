@@ -464,7 +464,7 @@ IndexExpression
     rest:("["_ @[0-9]+ _"]")+ _ {
     return rest.reduce(function(wish, curr) {
       const accumulative = curr;
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
   
@@ -494,7 +494,7 @@ applicationOrIndexOrAccessExpression
       if (type === ".") {
       	return makeStructAccess(wish, accumulative);
       }
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
 
