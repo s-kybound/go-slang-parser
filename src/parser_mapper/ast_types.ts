@@ -160,8 +160,8 @@ export class BasicTypeClass extends Type {
   }
 
   isSameType(type: Type) {
-    if (type instanceof BasicTypeClass) {
-      return this.type_value == type.type_value;
+    if (type.type_type == 'basic') {
+      return this.type_value == (type as BasicTypeClass).type_value;
     }
     return false;
   }
@@ -177,10 +177,10 @@ export class TupleType extends Type {
   }
   
   isSameType(type: Type) {
-    if (type instanceof TupleType) {
+    if (type.type_type == 'tuple') {
       let isSame = true;
       this.type_values.forEach((type_value, index) => {
-        isSame = isSame && (type.type_values[index] == type_value);
+        isSame = isSame && type_value.isSameType((type as TupleType).type_values[index]);
       });
       return isSame;
     }
@@ -195,7 +195,7 @@ export class FunctionType extends Type {
   
   // TODO: Make this more specific
   isSameType(type: Type) {
-    return (type instanceof FunctionType);
+    return type.type_type == 'function'
   }
 }
 
@@ -206,7 +206,7 @@ export class ChanType extends Type {
 
   // TODO: Make this more specific
   isSameType(type: Type) {
-    return (type instanceof ChanType);
+    return type.type_type == 'chan';
   }
 }
 
@@ -217,7 +217,7 @@ export class ArrayType extends Type {
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
-    return (type instanceof ArrayType);
+    return type.type_type == 'array';
   }
 }
 
@@ -228,7 +228,7 @@ export class SliceType extends Type {
   
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
-    return (type instanceof SliceType);
+    return type.type_type == 'slice';
   }
 }
 
@@ -239,7 +239,7 @@ export class CustomType extends Type {
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
-    return (type instanceof CustomType);
+    return type.type_type == 'custom';
   }
 }
 
@@ -250,7 +250,7 @@ export class StructType extends Type {
 
   // TODO: Make this more specific
   isSameType(type: Type): boolean {
-    return (type instanceof StructType);
+    return type.type_type == 'struct';
   }
 }
 
