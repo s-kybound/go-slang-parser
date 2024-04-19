@@ -27,7 +27,7 @@
   }
 
   function makeString(s) {
-    return s;
+    return s.join("");
   }
 
   function makeBoolean(b) {
@@ -541,14 +541,17 @@ nonBinaryOperatorExpression
 literal
   = literal:(number / bool / string) { return makeLiteral(literal); }
 
+// negative numbers are handled by the unary operator
 number
-  = n:[0-9]+ { return makeInteger(n); }
+  = int:[0-9]+ frac:("." @[0-9]+)? {
+    return parseFloat(frac ? int + "." + frac : int, 10);
+  }
 
 bool
   = b:("true" / "false") { return makeBoolean(b); }
 
 string
-  = s:("\"" @[^"]* "\"") { return makeString(text()); }
+  = s:("\"" @[^"]* "\"") { return makeString(s); }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
 
