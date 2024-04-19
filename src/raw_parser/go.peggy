@@ -461,10 +461,10 @@ StructLiteral
 
 IndexExpression
   = _ target:operableExpression _ 
-    rest:("["_ @[0-9]+ _"]")+ _ {
+    rest:("["_ @([0-9]+/Identifier) _"]")+ _ {
     return rest.reduce(function(wish, curr) {
       const accumulative = curr;
-      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
   
@@ -483,7 +483,7 @@ applicationValueList
 applicationOrIndexOrAccessExpression
   = _ target:operableExpression _ 
     rest:(
-    @"["_ @[0-9]+ _"]" 
+    @"["_ @([0-9]+/Identifier) _"]" 
     / @"(" _ @applicationValueList? _ ")"
     / @"." @Identifier)+ _ {
     return rest.reduce(function(wish, curr) {
@@ -494,7 +494,7 @@ applicationOrIndexOrAccessExpression
       if (type === ".") {
       	return makeStructAccess(wish, accumulative);
       }
-      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
 

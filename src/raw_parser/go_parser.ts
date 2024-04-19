@@ -1058,7 +1058,7 @@ return [head, ...tail]};// @ts-ignore
 // @ts-ignore
       const accumulative = curr;
 // @ts-ignore
-      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore
@@ -1091,7 +1091,7 @@ return [head, ...tail]};// @ts-ignore
       	return makeStructAccess(wish, accumulative);
       }
 // @ts-ignore
-      return makeIndexAccess(wish, makeLiteral(parseInt(accumulative.join(""), 10)));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore
@@ -4850,6 +4850,11 @@ peg$parseIndexExpression() {
           s8 = peg$FAILED;
         }
 // @ts-ignore
+        if (s8 === peg$FAILED) {
+// @ts-ignore
+          s8 = peg$parseIdentifier();
+        }
+// @ts-ignore
         if (s8 !== peg$FAILED) {
 // @ts-ignore
           s9 = peg$parse_();
@@ -4955,6 +4960,11 @@ peg$parseIndexExpression() {
             } else {
 // @ts-ignore
               s8 = peg$FAILED;
+            }
+// @ts-ignore
+            if (s8 === peg$FAILED) {
+// @ts-ignore
+              s8 = peg$parseIdentifier();
             }
 // @ts-ignore
             if (s8 !== peg$FAILED) {
@@ -5372,6 +5382,11 @@ peg$parseapplicationOrIndexOrAccessExpression() {
           s8 = peg$FAILED;
         }
 // @ts-ignore
+        if (s8 === peg$FAILED) {
+// @ts-ignore
+          s8 = peg$parseIdentifier();
+        }
+// @ts-ignore
         if (s8 !== peg$FAILED) {
 // @ts-ignore
           s9 = peg$parse_();
@@ -5579,6 +5594,11 @@ peg$parseapplicationOrIndexOrAccessExpression() {
             } else {
 // @ts-ignore
               s8 = peg$FAILED;
+            }
+// @ts-ignore
+            if (s8 === peg$FAILED) {
+// @ts-ignore
+              s8 = peg$parseIdentifier();
             }
 // @ts-ignore
             if (s8 !== peg$FAILED) {
@@ -9572,7 +9592,7 @@ export type StructFieldInstantiationList = [
   ...[_, ",", _, StructFieldInstantiation][]
 ];
 export type StructLiteral = { type: string; val_type: any; fields: any };
-export type IndexExpression = string[];
+export type IndexExpression = any;
 export type StructField = Identifier;
 export type ApplicationValueList = [
   Expression | Type,
