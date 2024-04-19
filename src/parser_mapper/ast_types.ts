@@ -189,7 +189,7 @@ export class TupleType extends Type {
 }
 
 export class FunctionType extends Type {
-  constructor(public formal_values: Type[], public return_value: Type) {
+  constructor(public formal_values: Type[], public return_value: Type | undefined) {
     super('function');
   }
   
