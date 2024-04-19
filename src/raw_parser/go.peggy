@@ -27,7 +27,7 @@
   }
 
   function makeString(s) {
-    return s;
+    return s.join("");
   }
 
   function makeBoolean(b) {
@@ -184,13 +184,15 @@
       type: "sendStatement",
       chan: chan,
       val: val,
+      inSelect: false
     }
   }
 
   function makeReceiveExpression(chan) {
     return {
       type: "receiveExpression",
-      chan: chan
+      chan: chan,
+      inSelect: false
     }
   }
 
@@ -539,14 +541,17 @@ nonBinaryOperatorExpression
 literal
   = literal:(number / bool / string) { return makeLiteral(literal); }
 
+// negative numbers are handled by the unary operator
 number
-  = n:[0-9]+ { return makeInteger(n); }
+  = int:[0-9]+ frac:("." @[0-9]+)? {
+    return parseFloat(frac ? int + "." + frac : int, 10);
+  }
 
 bool
   = b:("true" / "false") { return makeBoolean(b); }
 
 string
-  = s:("\"" @[^"]* "\"") { return makeString(text()); }
+  = s:("\"" @[^"]* "\"") { return makeString(s); }
 
 // the way this is ordered will freely give us left-associativity and operator precedence
 
@@ -653,9 +658,19 @@ receiveStatement
   
 selectCaseHeader
   = _ "case" spc s:(sendStatement/receiveStatement) _ ":" _ {
-  	return {
+  	// set this flag to true
+    if (s.type === "sendStatement") {
+    	s.inSelect = true;
+    } else if (s.type === "expressionStatement") {
+      s.expression.inSelect = true;
+    } else if (s.type === "declaration") {
+      s.vals[0].inSelect = true;
+    } else if (s.type === "assignmentStatement") {
+      s.vals[0].inSelect = true;
+    }
+    return {
     	type: "selectCase",
-        statement: s
+      statement: s
     }
   }
 
@@ -673,7 +688,7 @@ selectBranch
   }
 
 selectStatement
-  = _ "select" _ "{" branches: (_ @selectBranch _)* "}" _ {
+  = _ "select" _ "{" cases: (_ @selectBranch _)* "}" _ {
   	return {
     	type: "selectStatement",
       cases: cases ? cases : []

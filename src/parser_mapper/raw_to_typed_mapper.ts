@@ -33,6 +33,7 @@ import {
   StructType,
   TypeDeclaration,
   GoNode,
+  EmptyStatement,
 } from "./ast_types";
 
 // Type guard for Program
@@ -188,6 +189,10 @@ function isDefaultCase(node: any): node is DefaultCase {
   return node?.type === "defaultCase";
 }
 
+function isEmptyStatement(node: any): node is EmptyStatement {
+  return node?.type === "emptyStatement";
+}
+
 // with the above typeguards, we type up the untyped
 // AST of the parser output.
 // currently ignores types.
@@ -239,7 +244,9 @@ export function verifyNode(ast: any) {
   } else if (isGoStatement(ast)) {
     verifyNode(ast.app)
   } else if (isFunctionNode(ast)) {
-    verifyNode(ast.name)
+    if (ast.name) {
+      verifyNode(ast.name)
+    }
     ast.formals.forEach(verifyNode)
     ast.body.forEach(verifyNode)
   } else if (isIndexAccess(ast)) {
@@ -247,7 +254,7 @@ export function verifyNode(ast: any) {
     verifyNode(ast.index)
   } else if (isSendStatement(ast)) {
     verifyNode(ast.chan)
-    verifyNode(ast.value) 
+    verifyNode(ast.val) 
   } else if (isReceiveExpression(ast)) {
     verifyNode(ast.chan)
   } else if (isStructAccess(ast)) {
@@ -287,6 +294,8 @@ export function verifyNode(ast: any) {
     ast.body.forEach(verifyNode)
   } else if (isDefaultCase(ast)) {
     ast.body.forEach(verifyNode)
+  } else if (isEmptyStatement(ast)) {
+    // do nothing
   } else {
     throw new Error(`Unknown node type: ${ast}`);
   }

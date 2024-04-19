@@ -57,7 +57,7 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
   function makeString(s) {
 // @ts-ignore
-    return s;
+    return s.join("");
   }
 
 // @ts-ignore
@@ -310,6 +310,8 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
       chan: chan,
 // @ts-ignore
       val: val,
+// @ts-ignore
+      inSelect: false
     }
   }
 
@@ -320,7 +322,9 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       type: "receiveExpression",
 // @ts-ignore
-      chan: chan
+      chan: chan,
+// @ts-ignore
+      inSelect: false
     }
   }
 
@@ -1098,14 +1102,16 @@ return [head, ...tail]};// @ts-ignore
   var peg$f32 = function(literal) {// @ts-ignore
  return makeLiteral(literal); };// @ts-ignore
 
-  var peg$f33 = function(n) {// @ts-ignore
- return makeInteger(n); };// @ts-ignore
+  var peg$f33 = function(int, frac) {
+// @ts-ignore
+    return parseFloat(frac ? int + "." + frac : int, 10);
+  };// @ts-ignore
 
   var peg$f34 = function(b) {// @ts-ignore
  return makeBoolean(b); };// @ts-ignore
 
   var peg$f35 = function(s) {// @ts-ignore
- return makeString(text()); };// @ts-ignore
+ return makeString(s); };// @ts-ignore
 
   var peg$f36 = function(left, rest) { 
 // @ts-ignore
@@ -1215,12 +1221,30 @@ return elif;};// @ts-ignore
   };// @ts-ignore
 
   var peg$f55 = function(s) {
+  	// set this flag to true
 // @ts-ignore
-  	return {
+    if (s.type === "sendStatement") {
+// @ts-ignore
+    	s.inSelect = true;
+// @ts-ignore
+    } else if (s.type === "expressionStatement") {
+// @ts-ignore
+      s.expression.inSelect = true;
+// @ts-ignore
+    } else if (s.type === "declaration") {
+// @ts-ignore
+      s.vals[0].inSelect = true;
+// @ts-ignore
+    } else if (s.type === "assignmentStatement") {
+// @ts-ignore
+      s.vals[0].inSelect = true;
+    }
+// @ts-ignore
+    return {
 // @ts-ignore
     	type: "selectCase",
 // @ts-ignore
-        statement: s
+      statement: s
     }
   };// @ts-ignore
 
@@ -1239,7 +1263,7 @@ return elif;};// @ts-ignore
     return branch;
   };// @ts-ignore
 
-  var peg$f58 = function(branches) {
+  var peg$f58 = function(cases) {
 // @ts-ignore
   	return {
 // @ts-ignore
@@ -6005,7 +6029,7 @@ peg$parseliteral() {
   function // @ts-ignore
 peg$parsenumber() {
 // @ts-ignore
-    var s0, s1, s2;
+    var s0, s1, s2, s3, s4, s5;
 
 // @ts-ignore
     s0 = peg$currPos;
@@ -6052,12 +6076,96 @@ peg$parsenumber() {
 // @ts-ignore
     if (s1 !== peg$FAILED) {
 // @ts-ignore
+      s2 = peg$currPos;
+// @ts-ignore
+      if (input.charCodeAt(peg$currPos) === 46) {
+// @ts-ignore
+        s3 = peg$c42;
+// @ts-ignore
+        peg$currPos++;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        s3 = peg$FAILED;
+// @ts-ignore
+        if (peg$silentFails === 0) { peg$fail(peg$e48); }
+      }
+// @ts-ignore
+      if (s3 !== peg$FAILED) {
+// @ts-ignore
+        s4 = [];
+// @ts-ignore
+        s5 = input.charAt(peg$currPos);
+// @ts-ignore
+        if (peg$r2.test(s5)) {
+// @ts-ignore
+          peg$currPos++;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          s5 = peg$FAILED;
+// @ts-ignore
+          if (peg$silentFails === 0) { peg$fail(peg$e46); }
+        }
+// @ts-ignore
+        if (s5 !== peg$FAILED) {
+// @ts-ignore
+          while (s5 !== peg$FAILED) {
+// @ts-ignore
+            s4.push(s5);
+// @ts-ignore
+            s5 = input.charAt(peg$currPos);
+// @ts-ignore
+            if (peg$r2.test(s5)) {
+// @ts-ignore
+              peg$currPos++;
+// @ts-ignore
+            } else {
+// @ts-ignore
+              s5 = peg$FAILED;
+// @ts-ignore
+              if (peg$silentFails === 0) { peg$fail(peg$e46); }
+            }
+          }
+// @ts-ignore
+        } else {
+// @ts-ignore
+          s4 = peg$FAILED;
+        }
+// @ts-ignore
+        if (s4 !== peg$FAILED) {
+// @ts-ignore
+          s2 = s4;
+// @ts-ignore
+        } else {
+// @ts-ignore
+          peg$currPos = s2;
+// @ts-ignore
+          s2 = peg$FAILED;
+        }
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s2;
+// @ts-ignore
+        s2 = peg$FAILED;
+      }
+// @ts-ignore
+      if (s2 === peg$FAILED) {
+// @ts-ignore
+        s2 = null;
+      }
+// @ts-ignore
       peg$savedPos = s0;
 // @ts-ignore
-      s1 = peg$f33(s1);
-    }
+      s0 = peg$f33(s1, s2);
 // @ts-ignore
-    s0 = s1;
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
+    }
 
 // @ts-ignore
     return s0;
@@ -9514,7 +9622,7 @@ export type Binop =
   | AdditiveBinop
   | MultiplicativeBinop;
 export type Unop =
-  | { type: string; chan: any }
+  | { type: string; chan: any; inSelect: boolean }
   | { type: string; opcode: any; expr: any };
 export type IdentifierOrIndexList = [
   IndexExpression | StructField | Identifier,
@@ -9540,8 +9648,13 @@ export type ForStatement = {
   body: any;
 };
 export type GoStatement = { type: string; app: any };
-export type SendStatement = { type: string; chan: any; val: any };
-export type ReceiveExpression = { type: string; chan: any };
+export type SendStatement = {
+  type: string;
+  chan: any;
+  val: any;
+  inSelect: boolean;
+};
+export type ReceiveExpression = { type: string; chan: any; inSelect: boolean };
 export type ReceiveStatement =
   | { type: string; declaration_type: any; ids: any; vals: any }
   | { type: string; ids: any; vals: any }
@@ -9552,7 +9665,10 @@ export type SelectCaseHeader = {
 };
 export type DefaultCaseHeader = { type: "defaultCase" };
 export type SelectBranch = SelectCaseHeader | DefaultCaseHeader;
-export type SelectStatement = { type: "selectStatement"; cases: any };
+export type SelectStatement = {
+  type: "selectStatement";
+  cases: SelectBranch[] | never[];
+};
 export type TypeDeclaration = { type: string; name: any; dec_type: any };
 export type Statement =
   | (
