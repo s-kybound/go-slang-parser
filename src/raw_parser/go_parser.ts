@@ -1104,7 +1104,7 @@ return [head, ...tail]};// @ts-ignore
 
   var peg$f33 = function(int, frac) {
 // @ts-ignore
-    return parseFloat(frac ? int + "." + frac : int, 10);
+    return makeInteger(int);
   };// @ts-ignore
 
   var peg$f34 = function(b) {// @ts-ignore

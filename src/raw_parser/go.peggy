@@ -544,7 +544,7 @@ literal
 // negative numbers are handled by the unary operator
 number
   = int:[0-9]+ frac:("." @[0-9]+)? {
-    return parseFloat(frac ? int + "." + frac : int, 10);
+    return makeInteger(int);
   }
 
 bool
