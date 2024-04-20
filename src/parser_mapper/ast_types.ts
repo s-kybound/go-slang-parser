@@ -29,7 +29,7 @@ export type NodeType =
   | "emptyStatement";
 export type DeclarationType = "var" | "const";
 export type OpCode = string; // Define as needed
-export type BasicType = "number" | "bool" | "string" | "Type";
+export type BasicType = "number" | "boolean" | "string" | "Type";
 
 // Base class for all AST nodes
 export abstract class GoNode {
@@ -248,13 +248,11 @@ export class FunctionType extends Type {
 }
 
 export class ChanType extends Type {
-  type: "type";
-  type_type: "chan";
   constructor(
     public send_receive_type: string,
     public chan_value_type: Type,
   ) {
-    super("chan")
+    super("chan");
   }
 }
 
@@ -275,7 +273,7 @@ export class SliceType extends Type {
 
 export class CustomType extends Type {
   constructor(public type_name: string) {
-    super("custom")
+    super("custom");
   }
 }
 

@@ -26,6 +26,10 @@
     return parseInt(i.join(""), 10);
   }
 
+  function makeFloat(int, frac) {
+    return parseFloat(int.join("") + "." + frac.join(""), 10);
+  }
+
   function makeString(s) {
     return s.join("");
   }
@@ -63,6 +67,11 @@
     return makeDeclaration(id_list, val_list, decType);
   }
   
+  function format_declaration(decType, declaration) {
+    declaration.declaration_type = decType;
+    return declaration;
+  }
+
   function getDefault(type) {
           switch (type.type_value) {
             case "number": return makeLiteral(0);
@@ -312,8 +321,8 @@ declaration
 
 standardDeclaration
   = _ decType:declarationType spc declarations:declarationList _ {
-  	declarations.declaration_type = decType;
-          return declarations
+    // ensure that the declaration type is correct;
+    return format_declaration(decType, declarations)
   }
 
 declarationType
@@ -325,7 +334,18 @@ declarationList
   
 groupedDeclarationList
   = _ "(" _ lists:standardDeclarationList* _ ")" _ {
-          return lists.flat();
+    const all_lists = lists.flat();
+    // we need to take the identifiers of each list
+    // and append them together
+
+    const all_ids = all_lists.map(list => list.ids).flat();
+
+    // we also need to take the values of each list
+    // and append them together
+
+    const all_vals = all_lists.map(list => list.vals ? list.vals : []).flat();
+
+    return makeDeclarations(all_ids, all_vals, "placeholder", false);
   }
 
 standardDeclarationList
@@ -544,6 +564,9 @@ literal
 // negative numbers are handled by the unary operator
 number
   = int:[0-9]+ frac:("." @[0-9]+)? {
+    if (frac !== null) {
+      return makeFloat(int, frac);
+    }
     return makeInteger(int);
   }
 
@@ -580,7 +603,7 @@ additive_binop
   / multiplicative_binop
 
 multiplicative_binop
-  = _ left:factor _ rest:(@[\*\/] _ @factor)+ _ { 
+  = _ left:factor _ rest:(@[\*\/\%] _ @factor)+ _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
