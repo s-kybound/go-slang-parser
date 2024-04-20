@@ -1,6 +1,6 @@
-import { parse as raw_parse } from './raw_parser/go_parser';
-import * as go_ast from './parser_mapper/ast_types';
-import { convert, verifyNode } from './parser_mapper/raw_to_typed_mapper';
+import { parse as raw_parse } from "./raw_parser/go_parser";
+import * as go_ast from "./parser_mapper/ast_types";
+import { convert, verifyNode } from "./parser_mapper/raw_to_typed_mapper";
 
 // given a program string, parse it into a typed AST.
 export function parse(raw: string): go_ast.GoNode {
