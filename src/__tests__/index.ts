@@ -655,6 +655,14 @@ test("parses a go statement", () => {
   );
 });
 
+// prevents a quirk of our parser, that allows expressions such as array indexes or struct accesses
+// to be passed as the expression to a go statement, due to our unfamiliarity with parse expression grammar optimization.
+// instead, this is prevented during verification.
+test("prevents a go statement with a non-application expression", () => {
+  const statement = `go x[0];`;
+  expect(() => getFirstStatementFromFunction(statement)).toThrow();
+})
+
 test("parses a select statement", () => {
   const statement = `
   select { 
