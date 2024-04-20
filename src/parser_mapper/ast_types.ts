@@ -29,7 +29,7 @@ export class Literal extends GoNode {
 }
 
 export class Application extends GoNode {
-  constructor(public operator: GoNode, public operands: GoNode[]) {
+  constructor(public operator: Identifier | FunctionNode, public operands: GoNode[]) {
     super("application");
   }
 }
