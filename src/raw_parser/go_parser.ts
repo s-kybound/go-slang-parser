@@ -31,7 +31,7 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       name: id,
 // @ts-ignore
-      val_type: undefined
+      val_type: null
     }
   }
 
@@ -968,7 +968,7 @@ return [head, ...tail]};// @ts-ignore
 
   var peg$f11 = function(formals, retType, body) {
 // @ts-ignore
-  	return makeFunction(undefined, formals ? formals : [], retType, body);
+  	return makeFunction(null, formals ? formals : [], retType, body);
   };// @ts-ignore
 
   var peg$f12 = function(head, tail) {
@@ -9540,7 +9540,7 @@ export type AnonymousFunction = {
 };
 export type Function_1 = NamedFunction | AnonymousFunction;
 export type FormalsList = any;
-export type Identifier = { type: string; name: any; val_type: undefined };
+export type Identifier = { type: string; name: any; val_type: null };
 export type GoKeyword =
   | "break"
   | "case"

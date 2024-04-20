@@ -10,7 +10,7 @@
     return {
       type: "identifier",
       name: id,
-      val_type: undefined
+      val_type: null
     }
   }
 
@@ -357,7 +357,7 @@ namedFunction
 
 anonymousFunction
   = _ "func" _ "(" _ formals:formalsList? _ ")" _ retType:Type? _ "{" _ body:statement* _ "}" _ {
-  	return makeFunction(undefined, formals ? formals : [], retType, body);
+  	return makeFunction(null, formals ? formals : [], retType, body);
   }
 
 function

@@ -11,14 +11,13 @@ export abstract class GoNode {
 
 // Specific AST Node classes
 export class Program extends GoNode {
-  constructor(public top_declarations: Declaration[]) {
+  constructor(public top_declarations: (Declaration | FunctionNode | TypeDeclaration)[]) {
     super("program");
   }
 }
 
 export class Identifier extends GoNode {
-  val_type: Type | undefined;
-  constructor(public name: string) {
+  constructor(public name: string, public val_type: Type | null = null) {
     super("identifier");
   }
 }
@@ -78,7 +77,7 @@ export class IfStatement extends GoNode {
 }
 
 export class ForStatement extends GoNode {
-  constructor(public init: GoNode, public cond: GoNode, public post: GoNode, public body: GoNode[]) {
+  constructor(public init: GoNode | null, public cond: GoNode | null, public post: GoNode | null, public body: GoNode[]) {
     super("forStatement");
   }
 }
@@ -126,7 +125,7 @@ export class IndexAccess extends GoNode {
 }
 
 export class FunctionNode extends GoNode {
-  constructor(public name: Identifier, public formals: Identifier[], public retType: Type, public body: GoNode[]) {
+  constructor(public name: Identifier | null, public formals: Identifier[], public retType: Type | null, public body: GoNode[]) {
     super("function");
   }
 }
@@ -146,49 +145,73 @@ export interface Type {
 export class BasicTypeClass implements Type {
   type: "type";
   type_type: "basic";
-  constructor(public type_value: BasicType) {}
+  constructor(public type_value: BasicType) {
+    this.type = "type";
+    this.type_type = "basic";
+  }
 }
 
 export class TupleType implements Type {
   type: "type";
   type_type: "tuple";
-  constructor(public type_values: Type[]) {}
+  constructor(public type_values: Type[]) {
+    this.type = "type";
+    this.type_type = "tuple";
+  }
 }
 
 export class FunctionType implements Type {
   type: "type";
   type_type: "function";
-  constructor(public formal_values: Type[], public return_value: Type) {}
+  constructor(public formal_values: Type[], public return_value: Type) {
+    this.type = "type";
+    this.type_type = "function";
+  }
 }
 
 export class ChanType implements Type {
   type: "type";
   type_type: "chan";
-  constructor(public send_receive_type: string, public chan_value_type: Type) {}
+  constructor(public send_receive_type: string, public chan_value_type: Type) {
+    this.type = "type";
+    this.type_type = "chan";
+  }
 }
 
 export class ArrayType implements Type {
   type: "type";
   type_type: "array";
-  constructor(public arr_type: Type, public size: number) {}
+  constructor(public arr_type: Type, public size: number) {
+    this.type = "type";
+    this.type_type = "array";
+  }
 }
 
 export class SliceType implements Type {
   type: "type";
   type_type: "slice";
-  constructor(public slice_type: Type) {}
+  constructor(public slice_type: Type) {
+    this.type = "type";
+    this.type_type = "slice";
+  }
 }
 
 export class CustomType implements Type {
   type: "type";
   type_type: "custom";
-  constructor(public type_name: string) {}
+  constructor(public type_name: string) {
+    this.type = "type";
+    this.type_type = "custom";
+  }
 }
 
 export class StructType implements Type {
   type: "type";
   type_type: "struct";
-  constructor(public elems: StructElement[]) {}
+  constructor(public elems: StructElement[]) {
+    this.type = "type";
+    this.type_type = "struct";
+  }
 }
 
 export class StructElement extends GoNode {
@@ -216,7 +239,7 @@ export class StructAccess extends GoNode {
 }
 
 export class TypeDeclaration extends GoNode {
-  constructor(public name: Identifier, public dec_type: Type) {
+  constructor(public name: CustomType, public dec_type: Type) {
     super("typeDeclaration");
   }
 }
