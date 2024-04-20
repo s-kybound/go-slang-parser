@@ -3063,380 +3063,382 @@ peg$parseIdentifier() {
   function // @ts-ignore
 peg$parseGoKeyword() {
 // @ts-ignore
-    var s0, s1;
+    var s0, s1, s2, s3;
 
 // @ts-ignore
     peg$silentFails++;
 // @ts-ignore
+    s0 = peg$currPos;
+// @ts-ignore
     if (input.substr(peg$currPos, 5) === peg$c11) {
 // @ts-ignore
-      s0 = peg$c11;
+      s1 = peg$c11;
 // @ts-ignore
       peg$currPos += 5;
 // @ts-ignore
     } else {
 // @ts-ignore
-      s0 = peg$FAILED;
+      s1 = peg$FAILED;
 // @ts-ignore
       if (peg$silentFails === 0) { peg$fail(peg$e14); }
     }
 // @ts-ignore
-    if (s0 === peg$FAILED) {
+    if (s1 === peg$FAILED) {
 // @ts-ignore
       if (input.substr(peg$currPos, 4) === peg$c12) {
 // @ts-ignore
-        s0 = peg$c12;
+        s1 = peg$c12;
 // @ts-ignore
         peg$currPos += 4;
 // @ts-ignore
       } else {
 // @ts-ignore
-        s0 = peg$FAILED;
+        s1 = peg$FAILED;
 // @ts-ignore
         if (peg$silentFails === 0) { peg$fail(peg$e15); }
       }
 // @ts-ignore
-      if (s0 === peg$FAILED) {
+      if (s1 === peg$FAILED) {
 // @ts-ignore
         if (input.substr(peg$currPos, 4) === peg$c13) {
 // @ts-ignore
-          s0 = peg$c13;
+          s1 = peg$c13;
 // @ts-ignore
           peg$currPos += 4;
 // @ts-ignore
         } else {
 // @ts-ignore
-          s0 = peg$FAILED;
+          s1 = peg$FAILED;
 // @ts-ignore
           if (peg$silentFails === 0) { peg$fail(peg$e16); }
         }
 // @ts-ignore
-        if (s0 === peg$FAILED) {
+        if (s1 === peg$FAILED) {
 // @ts-ignore
           if (input.substr(peg$currPos, 5) === peg$c2) {
 // @ts-ignore
-            s0 = peg$c2;
+            s1 = peg$c2;
 // @ts-ignore
             peg$currPos += 5;
 // @ts-ignore
           } else {
 // @ts-ignore
-            s0 = peg$FAILED;
+            s1 = peg$FAILED;
 // @ts-ignore
             if (peg$silentFails === 0) { peg$fail(peg$e2); }
           }
 // @ts-ignore
-          if (s0 === peg$FAILED) {
+          if (s1 === peg$FAILED) {
 // @ts-ignore
             if (input.substr(peg$currPos, 8) === peg$c14) {
 // @ts-ignore
-              s0 = peg$c14;
+              s1 = peg$c14;
 // @ts-ignore
               peg$currPos += 8;
 // @ts-ignore
             } else {
 // @ts-ignore
-              s0 = peg$FAILED;
+              s1 = peg$FAILED;
 // @ts-ignore
               if (peg$silentFails === 0) { peg$fail(peg$e17); }
             }
 // @ts-ignore
-            if (s0 === peg$FAILED) {
+            if (s1 === peg$FAILED) {
 // @ts-ignore
               if (input.substr(peg$currPos, 7) === peg$c15) {
 // @ts-ignore
-                s0 = peg$c15;
+                s1 = peg$c15;
 // @ts-ignore
                 peg$currPos += 7;
 // @ts-ignore
               } else {
 // @ts-ignore
-                s0 = peg$FAILED;
+                s1 = peg$FAILED;
 // @ts-ignore
                 if (peg$silentFails === 0) { peg$fail(peg$e18); }
               }
 // @ts-ignore
-              if (s0 === peg$FAILED) {
+              if (s1 === peg$FAILED) {
 // @ts-ignore
                 if (input.substr(peg$currPos, 5) === peg$c16) {
 // @ts-ignore
-                  s0 = peg$c16;
+                  s1 = peg$c16;
 // @ts-ignore
                   peg$currPos += 5;
 // @ts-ignore
                 } else {
 // @ts-ignore
-                  s0 = peg$FAILED;
+                  s1 = peg$FAILED;
 // @ts-ignore
                   if (peg$silentFails === 0) { peg$fail(peg$e19); }
                 }
 // @ts-ignore
-                if (s0 === peg$FAILED) {
+                if (s1 === peg$FAILED) {
 // @ts-ignore
                   if (input.substr(peg$currPos, 4) === peg$c17) {
 // @ts-ignore
-                    s0 = peg$c17;
+                    s1 = peg$c17;
 // @ts-ignore
                     peg$currPos += 4;
 // @ts-ignore
                   } else {
 // @ts-ignore
-                    s0 = peg$FAILED;
+                    s1 = peg$FAILED;
 // @ts-ignore
                     if (peg$silentFails === 0) { peg$fail(peg$e20); }
                   }
 // @ts-ignore
-                  if (s0 === peg$FAILED) {
+                  if (s1 === peg$FAILED) {
 // @ts-ignore
                     if (input.substr(peg$currPos, 11) === peg$c18) {
 // @ts-ignore
-                      s0 = peg$c18;
+                      s1 = peg$c18;
 // @ts-ignore
                       peg$currPos += 11;
 // @ts-ignore
                     } else {
 // @ts-ignore
-                      s0 = peg$FAILED;
+                      s1 = peg$FAILED;
 // @ts-ignore
                       if (peg$silentFails === 0) { peg$fail(peg$e21); }
                     }
 // @ts-ignore
-                    if (s0 === peg$FAILED) {
+                    if (s1 === peg$FAILED) {
 // @ts-ignore
                       if (input.substr(peg$currPos, 3) === peg$c19) {
 // @ts-ignore
-                        s0 = peg$c19;
+                        s1 = peg$c19;
 // @ts-ignore
                         peg$currPos += 3;
 // @ts-ignore
                       } else {
 // @ts-ignore
-                        s0 = peg$FAILED;
+                        s1 = peg$FAILED;
 // @ts-ignore
                         if (peg$silentFails === 0) { peg$fail(peg$e22); }
                       }
 // @ts-ignore
-                      if (s0 === peg$FAILED) {
+                      if (s1 === peg$FAILED) {
 // @ts-ignore
                         if (input.substr(peg$currPos, 4) === peg$c8) {
 // @ts-ignore
-                          s0 = peg$c8;
+                          s1 = peg$c8;
 // @ts-ignore
                           peg$currPos += 4;
 // @ts-ignore
                         } else {
 // @ts-ignore
-                          s0 = peg$FAILED;
+                          s1 = peg$FAILED;
 // @ts-ignore
                           if (peg$silentFails === 0) { peg$fail(peg$e8); }
                         }
 // @ts-ignore
-                        if (s0 === peg$FAILED) {
+                        if (s1 === peg$FAILED) {
 // @ts-ignore
                           if (input.substr(peg$currPos, 2) === peg$c20) {
 // @ts-ignore
-                            s0 = peg$c20;
+                            s1 = peg$c20;
 // @ts-ignore
                             peg$currPos += 2;
 // @ts-ignore
                           } else {
 // @ts-ignore
-                            s0 = peg$FAILED;
+                            s1 = peg$FAILED;
 // @ts-ignore
                             if (peg$silentFails === 0) { peg$fail(peg$e23); }
                           }
 // @ts-ignore
-                          if (s0 === peg$FAILED) {
+                          if (s1 === peg$FAILED) {
 // @ts-ignore
                             if (input.substr(peg$currPos, 4) === peg$c21) {
 // @ts-ignore
-                              s0 = peg$c21;
+                              s1 = peg$c21;
 // @ts-ignore
                               peg$currPos += 4;
 // @ts-ignore
                             } else {
 // @ts-ignore
-                              s0 = peg$FAILED;
+                              s1 = peg$FAILED;
 // @ts-ignore
                               if (peg$silentFails === 0) { peg$fail(peg$e24); }
                             }
 // @ts-ignore
-                            if (s0 === peg$FAILED) {
+                            if (s1 === peg$FAILED) {
 // @ts-ignore
                               if (input.substr(peg$currPos, 2) === peg$c22) {
 // @ts-ignore
-                                s0 = peg$c22;
+                                s1 = peg$c22;
 // @ts-ignore
                                 peg$currPos += 2;
 // @ts-ignore
                               } else {
 // @ts-ignore
-                                s0 = peg$FAILED;
+                                s1 = peg$FAILED;
 // @ts-ignore
                                 if (peg$silentFails === 0) { peg$fail(peg$e25); }
                               }
 // @ts-ignore
-                              if (s0 === peg$FAILED) {
+                              if (s1 === peg$FAILED) {
 // @ts-ignore
                                 if (input.substr(peg$currPos, 6) === peg$c23) {
 // @ts-ignore
-                                  s0 = peg$c23;
+                                  s1 = peg$c23;
 // @ts-ignore
                                   peg$currPos += 6;
 // @ts-ignore
                                 } else {
 // @ts-ignore
-                                  s0 = peg$FAILED;
+                                  s1 = peg$FAILED;
 // @ts-ignore
                                   if (peg$silentFails === 0) { peg$fail(peg$e26); }
                                 }
 // @ts-ignore
-                                if (s0 === peg$FAILED) {
+                                if (s1 === peg$FAILED) {
 // @ts-ignore
                                   if (input.substr(peg$currPos, 9) === peg$c24) {
 // @ts-ignore
-                                    s0 = peg$c24;
+                                    s1 = peg$c24;
 // @ts-ignore
                                     peg$currPos += 9;
 // @ts-ignore
                                   } else {
 // @ts-ignore
-                                    s0 = peg$FAILED;
+                                    s1 = peg$FAILED;
 // @ts-ignore
                                     if (peg$silentFails === 0) { peg$fail(peg$e27); }
                                   }
 // @ts-ignore
-                                  if (s0 === peg$FAILED) {
+                                  if (s1 === peg$FAILED) {
 // @ts-ignore
                                     if (input.substr(peg$currPos, 3) === peg$c25) {
 // @ts-ignore
-                                      s0 = peg$c25;
+                                      s1 = peg$c25;
 // @ts-ignore
                                       peg$currPos += 3;
 // @ts-ignore
                                     } else {
 // @ts-ignore
-                                      s0 = peg$FAILED;
+                                      s1 = peg$FAILED;
 // @ts-ignore
                                       if (peg$silentFails === 0) { peg$fail(peg$e28); }
                                     }
 // @ts-ignore
-                                    if (s0 === peg$FAILED) {
+                                    if (s1 === peg$FAILED) {
 // @ts-ignore
                                       if (input.substr(peg$currPos, 7) === peg$c26) {
 // @ts-ignore
-                                        s0 = peg$c26;
+                                        s1 = peg$c26;
 // @ts-ignore
                                         peg$currPos += 7;
 // @ts-ignore
                                       } else {
 // @ts-ignore
-                                        s0 = peg$FAILED;
+                                        s1 = peg$FAILED;
 // @ts-ignore
                                         if (peg$silentFails === 0) { peg$fail(peg$e29); }
                                       }
 // @ts-ignore
-                                      if (s0 === peg$FAILED) {
+                                      if (s1 === peg$FAILED) {
 // @ts-ignore
                                         if (input.substr(peg$currPos, 5) === peg$c27) {
 // @ts-ignore
-                                          s0 = peg$c27;
+                                          s1 = peg$c27;
 // @ts-ignore
                                           peg$currPos += 5;
 // @ts-ignore
                                         } else {
 // @ts-ignore
-                                          s0 = peg$FAILED;
+                                          s1 = peg$FAILED;
 // @ts-ignore
                                           if (peg$silentFails === 0) { peg$fail(peg$e30); }
                                         }
 // @ts-ignore
-                                        if (s0 === peg$FAILED) {
+                                        if (s1 === peg$FAILED) {
 // @ts-ignore
                                           if (input.substr(peg$currPos, 6) === peg$c28) {
 // @ts-ignore
-                                            s0 = peg$c28;
+                                            s1 = peg$c28;
 // @ts-ignore
                                             peg$currPos += 6;
 // @ts-ignore
                                           } else {
 // @ts-ignore
-                                            s0 = peg$FAILED;
+                                            s1 = peg$FAILED;
 // @ts-ignore
                                             if (peg$silentFails === 0) { peg$fail(peg$e31); }
                                           }
 // @ts-ignore
-                                          if (s0 === peg$FAILED) {
+                                          if (s1 === peg$FAILED) {
 // @ts-ignore
                                             if (input.substr(peg$currPos, 6) === peg$c29) {
 // @ts-ignore
-                                              s0 = peg$c29;
+                                              s1 = peg$c29;
 // @ts-ignore
                                               peg$currPos += 6;
 // @ts-ignore
                                             } else {
 // @ts-ignore
-                                              s0 = peg$FAILED;
+                                              s1 = peg$FAILED;
 // @ts-ignore
                                               if (peg$silentFails === 0) { peg$fail(peg$e32); }
                                             }
 // @ts-ignore
-                                            if (s0 === peg$FAILED) {
+                                            if (s1 === peg$FAILED) {
 // @ts-ignore
                                               if (input.substr(peg$currPos, 6) === peg$c30) {
 // @ts-ignore
-                                                s0 = peg$c30;
+                                                s1 = peg$c30;
 // @ts-ignore
                                                 peg$currPos += 6;
 // @ts-ignore
                                               } else {
 // @ts-ignore
-                                                s0 = peg$FAILED;
+                                                s1 = peg$FAILED;
 // @ts-ignore
                                                 if (peg$silentFails === 0) { peg$fail(peg$e33); }
                                               }
 // @ts-ignore
-                                              if (s0 === peg$FAILED) {
+                                              if (s1 === peg$FAILED) {
 // @ts-ignore
                                                 if (input.substr(peg$currPos, 6) === peg$c31) {
 // @ts-ignore
-                                                  s0 = peg$c31;
+                                                  s1 = peg$c31;
 // @ts-ignore
                                                   peg$currPos += 6;
 // @ts-ignore
                                                 } else {
 // @ts-ignore
-                                                  s0 = peg$FAILED;
+                                                  s1 = peg$FAILED;
 // @ts-ignore
                                                   if (peg$silentFails === 0) { peg$fail(peg$e34); }
                                                 }
 // @ts-ignore
-                                                if (s0 === peg$FAILED) {
+                                                if (s1 === peg$FAILED) {
 // @ts-ignore
                                                   if (input.substr(peg$currPos, 4) === peg$c32) {
 // @ts-ignore
-                                                    s0 = peg$c32;
+                                                    s1 = peg$c32;
 // @ts-ignore
                                                     peg$currPos += 4;
 // @ts-ignore
                                                   } else {
 // @ts-ignore
-                                                    s0 = peg$FAILED;
+                                                    s1 = peg$FAILED;
 // @ts-ignore
                                                     if (peg$silentFails === 0) { peg$fail(peg$e35); }
                                                   }
 // @ts-ignore
-                                                  if (s0 === peg$FAILED) {
+                                                  if (s1 === peg$FAILED) {
 // @ts-ignore
                                                     if (input.substr(peg$currPos, 3) === peg$c1) {
 // @ts-ignore
-                                                      s0 = peg$c1;
+                                                      s1 = peg$c1;
 // @ts-ignore
                                                       peg$currPos += 3;
 // @ts-ignore
                                                     } else {
 // @ts-ignore
-                                                      s0 = peg$FAILED;
+                                                      s1 = peg$FAILED;
 // @ts-ignore
                                                       if (peg$silentFails === 0) { peg$fail(peg$e1); }
                                                     }
@@ -3463,6 +3465,58 @@ peg$parseGoKeyword() {
           }
         }
       }
+    }
+// @ts-ignore
+    if (s1 !== peg$FAILED) {
+// @ts-ignore
+      s2 = peg$currPos;
+// @ts-ignore
+      peg$silentFails++;
+// @ts-ignore
+      s3 = input.charAt(peg$currPos);
+// @ts-ignore
+      if (peg$r1.test(s3)) {
+// @ts-ignore
+        peg$currPos++;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        s3 = peg$FAILED;
+// @ts-ignore
+        if (peg$silentFails === 0) { peg$fail(peg$e12); }
+      }
+// @ts-ignore
+      peg$silentFails--;
+// @ts-ignore
+      if (s3 === peg$FAILED) {
+// @ts-ignore
+        s2 = undefined;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s2;
+// @ts-ignore
+        s2 = peg$FAILED;
+      }
+// @ts-ignore
+      if (s2 !== peg$FAILED) {
+// @ts-ignore
+        s1 = [s1, s2];
+// @ts-ignore
+        s0 = s1;
+// @ts-ignore
+      } else {
+// @ts-ignore
+        peg$currPos = s0;
+// @ts-ignore
+        s0 = peg$FAILED;
+      }
+// @ts-ignore
+    } else {
+// @ts-ignore
+      peg$currPos = s0;
+// @ts-ignore
+      s0 = peg$FAILED;
     }
 // @ts-ignore
     peg$silentFails--;
@@ -9483,32 +9537,36 @@ export type AnonymousFunction = {
 export type Function_1 = NamedFunction | AnonymousFunction;
 export type FormalsList = any;
 export type Identifier = { type: string; name: any; val_type: null };
-export type GoKeyword =
-  | "break"
-  | "case"
-  | "chan"
-  | "const"
-  | "continue"
-  | "default"
-  | "defer"
-  | "else"
-  | "fallthrough"
-  | "for"
-  | "func"
-  | "go"
-  | "goto"
-  | "if"
-  | "import"
-  | "interface"
-  | "map"
-  | "package"
-  | "range"
-  | "return"
-  | "select"
-  | "struct"
-  | "switch"
-  | "type"
-  | "var";
+export type GoKeyword = [
+  (
+    | "break"
+    | "case"
+    | "chan"
+    | "const"
+    | "continue"
+    | "default"
+    | "defer"
+    | "else"
+    | "fallthrough"
+    | "for"
+    | "func"
+    | "go"
+    | "goto"
+    | "if"
+    | "import"
+    | "interface"
+    | "map"
+    | "package"
+    | "range"
+    | "return"
+    | "select"
+    | "struct"
+    | "switch"
+    | "type"
+    | "var"
+  ),
+  undefined
+];
 export type Type = InbuiltType | CustomType;
 export type InbuiltType =
   | FunctionType

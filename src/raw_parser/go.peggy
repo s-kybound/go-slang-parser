@@ -399,9 +399,9 @@ Identifier
   }
 
 GoKeyword "reserved syntax keyword"
-  = "break" / "case" / "chan" / "const" / "continue" / "default" / "defer" / "else"
+  = ("break" / "case" / "chan" / "const" / "continue" / "default" / "defer" / "else"
     / "fallthrough" / "for" / "func" / "go" / "goto" / "if" / "import" / "interface"
-    / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var"
+    / "map" / "package" / "range" / "return" / "select" / "struct" / "switch" / "type" / "var") !([a-zA-Z0-9_]) 
 
 Type "go type"
   = InbuiltType / CustomType
