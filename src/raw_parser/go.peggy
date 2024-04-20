@@ -226,7 +226,7 @@
   function makeBasicType(type) {
     return makeType({
       type_type: "basic",
-      type_value: type
+      type_value: type === "boolean" ? "bool" : type
     })
   }
   

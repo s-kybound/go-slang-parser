@@ -1,0 +1,83 @@
+<program> ::= { <declaration> } ;
+<declaration> ::= <variable declaration> | <function definition> | <type declaration> ;
+
+<variable declaration> ::= <explicit declaration> | <implicit declaration> ;
+<explicit declaration> ::= ( "var" | "const" ) ( <simple declaration> | <group declaration> ) ";" ;
+<simple declaration> ::= <typed identifier list> "=" <expression list> ;
+<group declaration> ::= "(" <simple declaration> ";" { <simple declaration> ";" } ")" ";" ;
+<implicit declaration> ::= <identifier list> ":=" <expression list> ";" ;
+<typed identifier list> ::= <identifier list> <type> ;
+<identifier list> ::= <identifier> { "," <identifier> } ;
+<expression list> ::= <expression> { "," <expression> } ;
+
+<function definition> ::= "func" <identifier> "(" <typed idenfitier list> { "," <typed idenfitier list> } ")" <type> "{" { <statement> } "}" ;
+
+<statement> ::= <declaration> 
+            | <expression statement>
+            | <for statement> 
+            | <if statement> 
+            | <go statement> 
+            | <send statement> 
+            | <select statement> 
+            | <assignment statement> 
+            | <return statement> 
+            | <empty statement> ;
+
+<expression statement> ::= <expression> ";" ;
+<for statement> ::= "for" [ <statement> ] ";" [ <statement> ] ";" [ <statement> ] "{" { <statement> } "}" ;
+<if statement> ::= "if" [ <statement> ";" ] <expression> "{" { <statement> } "}" { "else if" <expression> "{" { <statement> } "}" } [ "else" "{" { <statement> } "}" ] ;
+<go statement> ::= "go" <application> ";" ;
+<send statement> ::= <expression> "<-" <expression> ";" ;
+<select statement> ::= "select" "{" { <select case> } "}" ;
+<select case> ::= "case" <expression> ":" { <statement> } | "default" ":" { <statement> } ;
+<assignment statement> ::= <expression> "=" <expression list> ";" ;
+<return statement> ::= "return" [ <expression list> ] ";" ;
+<empty statement> ::= ";" ;
+
+<expression> ::= <binary expression> 
+            | <unary expression> 
+            | <receive expression>
+            | <application>
+            | <indexAccess>
+            | <structAccess>
+            | <anonymous function>
+            | <struct literal>
+            | <literal>
+            | <identifier> ;
+
+<binary expression> ::= <expression> <binary operator> <expression> ;
+<binary operator> ::= "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ;
+
+<unary expression> ::= <unary operator> <expression> ;
+<unary operator> ::= "-" | "!" ;
+
+<receive expression> ::= "<-" <expression> ;
+
+<application> ::= <expression> "(" <expression list> ")" ;
+<indexAccess> ::= <expression> "[" <expression> "]" ;
+<structAccess> ::= <expression> "." <identifier> ;
+
+<anonymous function> ::= "func" "(" <typed identifier list> { "," <typed identifier list> } ")" <type> "{" { <statement> } "}" ;
+<struct literal> ::= <type> "{" { <identifier> ":" <expression> } "}" ;
+<identifier> ::= ( letter | digit | "_" ) { letter | digit | "_" } ;
+
+<literal> ::= <number> | <string> | <bool> ;
+<number> ::= <integer> | <float> ;
+<integer> ::= <digit> { <digit> } ;
+<float> ::= <integer> "." <integer> ;
+<string> ::= "\"" { <char> } "\"" ;
+<char> ::= <letter> | <digit> | <special> ;
+<bool> ::= "true" | "false" ;
+<letter> ::= "a" | ... | "Z" ;
+<digit> ::= "0" | ... | "9" ;
+<special> ::= "!" | ... | "/" | ":" | ... | "@" | "[" | ... | "`" | "{" | ... | "~" ;
+
+<type declaration> ::= type <identifier> <type> ";" ;
+<type> ::= <basic type> | <tuple type> | <channel type> | <array type> | <slice type> | <struct type> | <function type> ;
+<basic type> ::= "number" | "string" | "bool" | "Type" ;
+<tuple type> ::= "(" <type> { "," <type> } ")" ;
+<channel type> ::= ( "chan" | "chan<-" | "<-chan" ) { <type> } ;
+<array type> ::= "[" <expression> "]" <type> ;
+<slice type> ::= "[]" <type> ;
+<struct type> ::= "struct" "{" { <identifier> ":" <type> } "}" ;
+<function type> ::= "func" "(" <type> { "," <type> } ")" <type> ;

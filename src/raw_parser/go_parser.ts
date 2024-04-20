@@ -379,7 +379,7 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       type_type: "basic",
 // @ts-ignore
-      type_value: type
+      type_value: type === "boolean" ? "bool" : type
     })
   }
   

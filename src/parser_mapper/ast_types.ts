@@ -29,7 +29,7 @@ export type NodeType =
   | "emptyStatement";
 export type DeclarationType = "var" | "const";
 export type OpCode = string; // Define as needed
-export type BasicType = "number" | "boolean" | "string" | "Type";
+export type BasicType = "number" | "bool" | "string" | "Type";
 
 // Base class for all AST nodes
 export abstract class GoNode {

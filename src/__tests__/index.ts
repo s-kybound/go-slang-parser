@@ -247,7 +247,7 @@ test("parses a boolean literal", () => {
   const ast = getFirstStatementFromFunction(statement);
   expect(ast).toEqual(
     new go_ast.ExpressionStatement(
-      new go_ast.Literal(true, new go_ast.BasicTypeClass("boolean")),
+      new go_ast.Literal(true, new go_ast.BasicTypeClass("bool")),
     ),
   );
 });
@@ -661,7 +661,7 @@ test("parses a go statement", () => {
 test("prevents a go statement with a non-application expression", () => {
   const statement = `go x[0];`;
   expect(() => getFirstStatementFromFunction(statement)).toThrow();
-})
+});
 
 test("parses a select statement", () => {
   const statement = `
