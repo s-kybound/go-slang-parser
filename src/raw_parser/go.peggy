@@ -481,7 +481,7 @@ StructLiteral
 
 IndexExpression
   = _ target:operableExpression _ 
-    rest:("["_ @(binop/unop) _"]")+ _ {
+    rest:("["_ @(logical_binop/unop) _"]")+ _ {
     return rest.reduce(function(wish, curr) {
       const accumulative = curr;
       return makeIndexAccess(wish, accumulative);
@@ -527,7 +527,7 @@ operableExpression =
    / Identifier
 
 expression
-  = binop
+  = logical_binop
    / unop
    / applicationOrIndexOrAccessExpression
    / function
@@ -543,11 +543,6 @@ unaryOperatorValidExpressions
   / StructLiteral
   / literal
   / Identifier
-
-// an expression bounded by ()
-factor
-  = "(" expr:(binop / unop) ")" { return expr; }
-  / nonBinaryOperatorExpression
 
 // anything that can be applied to binary operators
 nonBinaryOperatorExpression
@@ -579,39 +574,37 @@ string
 // the way this is ordered will freely give us left-associativity and operator precedence
 
 logical_binop
-  = _ left: comparative_binop _ rest:(@("&&" / "||") _ @(comparative_binop))+ _ { 
+  = _ left:comparative_binop _ rest:( _ @("&&" / "||") _ @(comparative_binop))* _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
   }
-  / comparative_binop
 
 comparative_binop
-  = _ left:additive_binop _ rest:(@("==" / "!=" / "<=" / ">=" / "<" / ">") _ @(additive_binop))+ _ { 
+  = _ left:additive_binop _ rest:( _ @("==" / "!=" / "<=" / ">=" / "<" / ">") _ @(additive_binop))* _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
   }
-  / additive_binop
 
 additive_binop
-  = _ left:multiplicative_binop _ rest:(@[\+\-] _ @(multiplicative_binop))+ _ {
+  = _ left:multiplicative_binop _ rest:( _ @[\+\-] _ @(multiplicative_binop))* _ {
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
   }
-  / multiplicative_binop
 
 multiplicative_binop
-  = _ left:factor _ rest:(@[\*\/\%] _ @factor)+ _ { 
+  = _ left:factor _ rest:( _ @[\*\/\%] _ @(factor))* _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
   }
-  / factor
 
-binop
-  = logical_binop / comparative_binop / additive_binop / multiplicative_binop
+// an expression bounded by ()
+factor
+  = _ "(" _ expr:(logical_binop / unop) _ ")" _ { return expr; }
+  / nonBinaryOperatorExpression
 
 unop
   = _ opcode:(@"<-" _/[-+!]) expr:unaryOperatorValidExpressions _ { 

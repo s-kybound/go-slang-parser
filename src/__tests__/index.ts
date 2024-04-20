@@ -375,53 +375,53 @@ test("parses binary operations with parentheses", () => {
   );
 });
 
-// test("parses a complex binary operation", () => {
-//   const statement = `x + y * z / 4;`;
-//   const ast = getFirstStatementFromFunction(statement);
-//   expect(ast).toEqual(
-//     new go_ast.ExpressionStatement(
-//       new go_ast.BinOp(
-//         new go_ast.Identifier("x"),
-//         "+",
-//         new go_ast.BinOp(
-//           new go_ast.Identifier("y"),
-//           "*",
-//           new go_ast.BinOp(
-//             new go_ast.Identifier("z"),
-//             "/",
-//             new go_ast.Literal(4, new go_ast.BasicTypeClass("number")),
-//           ),
-//         ),
-//       ),
-//     ),
-//   );
-// });
+test("parses a complex binary operation", () => {
+  const statement = `x + y * z / 4;`;
+  const ast = getFirstStatementFromFunction(statement);
+  expect(ast).toEqual(
+    new go_ast.ExpressionStatement(
+      new go_ast.BinOp(
+        new go_ast.Identifier("x"),
+        "+",
+        new go_ast.BinOp(
+          new go_ast.BinOp(
+            new go_ast.Identifier("y"),
+            "*",
+            new go_ast.Identifier("z"),
+          ),
+          "/",
+          new go_ast.Literal(4, new go_ast.BasicTypeClass("number")),
+        ),
+      ),
+    ),
+  );
+});
 
-// test("parses an expression in BODMAS order", () => {
-//   const statement = `a + (x + y) * z / 4;`;
-//   const ast = getFirstStatementFromFunction(statement);
-//   expect(ast).toEqual(
-//     new go_ast.ExpressionStatement(
-//       new go_ast.BinOp(
-//         new go_ast.Identifier("a"),
-//         "+",
-//         new go_ast.BinOp(
-//           new go_ast.BinOp(
-//             new go_ast.Identifier("x"),
-//             "+",
-//             new go_ast.Identifier("y"),
-//           ),
-//           "*",
-//           new go_ast.BinOp(
-//             new go_ast.Identifier("z"),
-//             "/",
-//             new go_ast.Literal(4, new go_ast.BasicTypeClass("number")),
-//           ),
-//         ),
-//       ),
-//     ),
-//   );
-// });
+test("parses a complex expression in BODMAS order", () => {
+  const statement = `a + (x + y) * z / 4;`;
+  const ast = getFirstStatementFromFunction(statement);
+  expect(ast).toEqual(
+    new go_ast.ExpressionStatement(
+      new go_ast.BinOp(
+        new go_ast.Identifier("a"),
+        "+",
+        new go_ast.BinOp(
+          new go_ast.BinOp(
+            new go_ast.BinOp(
+              new go_ast.Identifier("x"),
+              "+",
+              new go_ast.Identifier("y"),
+            ),
+            "*",
+            new go_ast.Identifier("z"),
+          ),
+          "/",
+          new go_ast.Literal(4, new go_ast.BasicTypeClass("number")),
+        ),
+      ),
+    ),
+  );
+});
 
 test("parses a simple return statement", () => {
   const statement = `return 1;`;
@@ -765,25 +765,26 @@ test("parses a structType", () => {
       ]),
     ),
   );
-})
+});
 
 test("parses a struct literal", () => {
   const statement = 'a{a: 1, b: "hello"};';
   const ast = getFirstStatementFromFunction(statement);
   expect(ast).toEqual(
     new go_ast.ExpressionStatement(
-      new go_ast.StructLiteral(
-        new go_ast.CustomType("a"), [
+      new go_ast.StructLiteral(new go_ast.CustomType("a"), [
         new go_ast.StructFieldInstantiation(
           new go_ast.Identifier("a"),
-          new go_ast.Literal(1, new go_ast.BasicTypeClass("number"))),
+          new go_ast.Literal(1, new go_ast.BasicTypeClass("number")),
+        ),
         new go_ast.StructFieldInstantiation(
           new go_ast.Identifier("b"),
-          new go_ast.Literal("hello", new go_ast.BasicTypeClass("string"))),
+          new go_ast.Literal("hello", new go_ast.BasicTypeClass("string")),
+        ),
       ]),
     ),
   );
-})
+});
 
 test("parses a struct access", () => {
   const statement = "x.a;";
@@ -796,4 +797,4 @@ test("parses a struct access", () => {
       ),
     ),
   );
-})
+});
