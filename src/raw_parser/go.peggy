@@ -10,7 +10,7 @@
     return {
       type: "identifier",
       name: id,
-      val_type: undefined
+      val_type: null
     }
   }
 
@@ -357,7 +357,7 @@ namedFunction
 
 anonymousFunction
   = _ "func" _ "(" _ formals:formalsList? _ ")" _ retType:Type? _ "{" _ body:statement* _ "}" _ {
-  	return makeFunction(undefined, formals ? formals : [], retType, body);
+  	return makeFunction(null, formals ? formals : [], retType, body);
   }
 
 function
@@ -461,10 +461,10 @@ StructLiteral
 
 IndexExpression
   = _ target:operableExpression _ 
-    rest:("["_ @[0-9]+ _"]")+ _ {
+    rest:("["_ @([0-9]+/Identifier) _"]")+ _ {
     return rest.reduce(function(wish, curr) {
       const accumulative = curr;
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
   
@@ -483,7 +483,7 @@ applicationValueList
 applicationOrIndexOrAccessExpression
   = _ target:operableExpression _ 
     rest:(
-    @"["_ @[0-9]+ _"]" 
+    @"["_ @([0-9]+/Identifier) _"]" 
     / @"(" _ @applicationValueList? _ ")"
     / @"." @Identifier)+ _ {
     return rest.reduce(function(wish, curr) {
@@ -494,7 +494,7 @@ applicationOrIndexOrAccessExpression
       if (type === ".") {
       	return makeStructAccess(wish, accumulative);
       }
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
     }, target);  
   }
 
@@ -544,7 +544,7 @@ literal
 // negative numbers are handled by the unary operator
 number
   = int:[0-9]+ frac:("." @[0-9]+)? {
-    return parseFloat(frac ? int + "." + frac : int, 10);
+    return makeInteger(int);
   }
 
 bool

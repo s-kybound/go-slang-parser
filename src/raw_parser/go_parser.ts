@@ -31,7 +31,7 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       name: id,
 // @ts-ignore
-      val_type: undefined
+      val_type: null
     }
   }
 
@@ -968,7 +968,7 @@ return [head, ...tail]};// @ts-ignore
 
   var peg$f11 = function(formals, retType, body) {
 // @ts-ignore
-  	return makeFunction(undefined, formals ? formals : [], retType, body);
+  	return makeFunction(null, formals ? formals : [], retType, body);
   };// @ts-ignore
 
   var peg$f12 = function(head, tail) {
@@ -1058,7 +1058,7 @@ return [head, ...tail]};// @ts-ignore
 // @ts-ignore
       const accumulative = curr;
 // @ts-ignore
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore
@@ -1091,7 +1091,7 @@ return [head, ...tail]};// @ts-ignore
       	return makeStructAccess(wish, accumulative);
       }
 // @ts-ignore
-      return makeIndexAccess(wish, parseInt(accumulative.join(""), 10));
+      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
 // @ts-ignore
     }, target);  
   };// @ts-ignore
@@ -1104,7 +1104,7 @@ return [head, ...tail]};// @ts-ignore
 
   var peg$f33 = function(int, frac) {
 // @ts-ignore
-    return parseFloat(frac ? int + "." + frac : int, 10);
+    return makeInteger(int);
   };// @ts-ignore
 
   var peg$f34 = function(b) {// @ts-ignore
@@ -4850,6 +4850,11 @@ peg$parseIndexExpression() {
           s8 = peg$FAILED;
         }
 // @ts-ignore
+        if (s8 === peg$FAILED) {
+// @ts-ignore
+          s8 = peg$parseIdentifier();
+        }
+// @ts-ignore
         if (s8 !== peg$FAILED) {
 // @ts-ignore
           s9 = peg$parse_();
@@ -4955,6 +4960,11 @@ peg$parseIndexExpression() {
             } else {
 // @ts-ignore
               s8 = peg$FAILED;
+            }
+// @ts-ignore
+            if (s8 === peg$FAILED) {
+// @ts-ignore
+              s8 = peg$parseIdentifier();
             }
 // @ts-ignore
             if (s8 !== peg$FAILED) {
@@ -5372,6 +5382,11 @@ peg$parseapplicationOrIndexOrAccessExpression() {
           s8 = peg$FAILED;
         }
 // @ts-ignore
+        if (s8 === peg$FAILED) {
+// @ts-ignore
+          s8 = peg$parseIdentifier();
+        }
+// @ts-ignore
         if (s8 !== peg$FAILED) {
 // @ts-ignore
           s9 = peg$parse_();
@@ -5579,6 +5594,11 @@ peg$parseapplicationOrIndexOrAccessExpression() {
             } else {
 // @ts-ignore
               s8 = peg$FAILED;
+            }
+// @ts-ignore
+            if (s8 === peg$FAILED) {
+// @ts-ignore
+              s8 = peg$parseIdentifier();
             }
 // @ts-ignore
             if (s8 !== peg$FAILED) {
@@ -9520,7 +9540,7 @@ export type AnonymousFunction = {
 };
 export type Function_1 = NamedFunction | AnonymousFunction;
 export type FormalsList = any;
-export type Identifier = { type: string; name: any; val_type: undefined };
+export type Identifier = { type: string; name: any; val_type: null };
 export type GoKeyword =
   | "break"
   | "case"
@@ -9572,7 +9592,7 @@ export type StructFieldInstantiationList = [
   ...[_, ",", _, StructFieldInstantiation][]
 ];
 export type StructLiteral = { type: string; val_type: any; fields: any };
-export type IndexExpression = string[];
+export type IndexExpression = any;
 export type StructField = Identifier;
 export type ApplicationValueList = [
   Expression | Type,
