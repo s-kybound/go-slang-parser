@@ -333,7 +333,7 @@ declarationList
   / standardDeclarationList
   
 groupedDeclarationList
-  = _ "(" _ lists:standardDeclarationList* _ ")" _ {
+  = _ "(" _ lists:(@standardDeclarationList _ ";" _ )* _ ")" _ {
     const all_lists = lists.flat();
     // we need to take the identifiers of each list
     // and append them together
@@ -467,7 +467,7 @@ StructFieldInstantiation
   }
 
 StructFieldInstantiationList
-  = head:StructFieldInstantiation tail:(_ "," _ StructFieldInstantiation)* {
+  = head:StructFieldInstantiation tail:(_ "," _ @StructFieldInstantiation)* {
   	return [head, ...tail];
   }
 
@@ -481,10 +481,10 @@ StructLiteral
 
 IndexExpression
   = _ target:operableExpression _ 
-    rest:("["_ @([0-9]+/Identifier) _"]")+ _ {
+    rest:("["_ @(binop/unop) _"]")+ _ {
     return rest.reduce(function(wish, curr) {
       const accumulative = curr;
-      return makeIndexAccess(wish, accumulative.type === "identifier" ? accumulative : makeLiteral(parseInt(accumulative.join(""), 10)));
+      return makeIndexAccess(wish, accumulative);
     }, target);  
   }
   
@@ -527,7 +527,7 @@ operableExpression =
    / Identifier
 
 expression
-  =  binop
+  = binop
    / unop
    / applicationOrIndexOrAccessExpression
    / function
@@ -579,7 +579,7 @@ string
 // the way this is ordered will freely give us left-associativity and operator precedence
 
 logical_binop
-  = _ left: comparative_binop _ rest:(@("&&" / "||") _ @comparative_binop)+ _ { 
+  = _ left: comparative_binop _ rest:(@("&&" / "||") _ @(comparative_binop))+ _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
@@ -587,7 +587,7 @@ logical_binop
   / comparative_binop
 
 comparative_binop
-  = _ left:additive_binop _ rest:(@("==" / "!=" / "<=" / ">=" / "<" / ">") _ @additive_binop)+ _ { 
+  = _ left:additive_binop _ rest:(@("==" / "!=" / "<=" / ">=" / "<" / ">") _ @(additive_binop))+ _ { 
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
@@ -595,7 +595,7 @@ comparative_binop
   / additive_binop
 
 additive_binop
-  = _ left:multiplicative_binop _ rest:(@[\+\-] _ @multiplicative_binop)+ _ { 
+  = _ left:multiplicative_binop _ rest:(@[\+\-] _ @(multiplicative_binop))+ _ {
     return rest.reduce(function(wish, curr) {
       return makeBinop(wish, curr[0], curr[1]);
     }, left)
@@ -645,7 +645,7 @@ elseStatement
   / elseIfStatement
 
 elseIfStatement
-  = _ "else" spc elif:ifStatement _ {return elif;}
+  = _ "else" spc elif:ifStatement _ {return [elif];}
 
 forStatement
   = _ "for" spc init:statement? _ cond:expression? _ ";" _ post:(assignmentStatement / expressionStatement)? _ "{" _ body:statement* _ "}" _ {
