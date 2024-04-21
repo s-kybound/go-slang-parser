@@ -224,6 +224,18 @@ export class Type extends GoNode {
   constructor(public type_type: string) {
     super("type");
   }
+  equals(other: GoNode): boolean {
+    if (!(other instanceof Type)) {
+      return false;
+    }
+    if (this instanceof AnyType) {
+      return true;
+    }
+    if (other instanceof AnyType) {
+      return true;
+    }
+    return super.equals(other);
+  }
 }
 
 export class AnyType extends Type {
@@ -245,12 +257,32 @@ export class BasicTypeClass extends Type {
 }
 
 export class TupleType extends Type {
+  equals(other: GoNode): boolean {
+    if (!(other instanceof TupleType)) {
+      return super.equals(other);
+    }
+    if (this.type_values.length !== other.type_values.length) {
+      return false;
+    }
+    for (let i = 0; i < this.type_values.length; i++) {
+      if (!this.type_values[i].equals(other.type_values[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
   constructor(public type_values: Type[]) {
     super("tuple");
   }
 }
 
 export class FunctionType extends Type {
+  equals(other: GoNode): boolean {
+    if (!(other instanceof FunctionType)) {
+      return super.equals(other);
+    }
+    return this.formal_value.equals(other.formal_value) && this.return_value.equals(other.return_value);
+  }
   constructor(
     // for ease of use, we use TupleType to represent the formals
     // when there are more than one.
@@ -264,6 +296,18 @@ export class FunctionType extends Type {
 }
 
 export class ChanType extends Type {
+  equals(other: GoNode): boolean {
+    if (!(other instanceof ChanType)) {
+      return super.equals(other)
+    }
+    if (this.send_receive_type === "send" && other.send_receive_type === "receive") {
+      return false
+    } 
+    if (other.send_receive_type === "send" && this.send_receive_type === "receive") {
+      return false
+    }
+    return this.chan_value_type.equals(other.chan_value_type)
+  }
   constructor(
     public send_receive_type: string,
     public chan_value_type: Type,
@@ -273,6 +317,12 @@ export class ChanType extends Type {
 }
 
 export class ArrayType extends Type {
+  equals(other: GoNode) {
+    if (!(other instanceof ArrayType)) {
+      return super.equals(other)
+    }
+    return (this.size === other.size) && this.arr_type.equals(other.arr_type)
+  }
   constructor(
     public arr_type: Type,
     public size: number,
@@ -282,6 +332,12 @@ export class ArrayType extends Type {
 }
 
 export class SliceType extends Type {
+  equals(other: GoNode) {
+    if (!(other instanceof SliceType)) {
+      return super.equals(other)
+    }
+    return this.slice_type.equals(other.slice_type)
+  }
   constructor(public slice_type: Type) {
     super("slice");
   }
