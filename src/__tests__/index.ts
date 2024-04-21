@@ -663,6 +663,11 @@ test("prevents a go statement with a non-application expression", () => {
   expect(() => getFirstStatementFromFunction(statement)).toThrow();
 });
 
+test("named function declarations cannot be used as expressions", () => {
+  const statement = `go func i_shouldnt_work(){}();`;
+  expect(() => getFirstStatementFromFunction(statement)).toThrow();
+});
+
 test("parses a select statement", () => {
   const statement = `
   select { 

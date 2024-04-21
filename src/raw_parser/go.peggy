@@ -521,7 +521,7 @@ applicationOrIndexOrAccessExpression
 // something that can be applied or indexed together
 operableExpression =
    unop
-   / function
+   / anonymousFunction
    / literal
    / StructLiteral
    / Identifier
@@ -530,7 +530,7 @@ expression
   = logical_binop
    / unop
    / applicationOrIndexOrAccessExpression
-   / function
+   / anonymousFunction
    / StructLiteral
    / literal
    / Identifier
@@ -538,7 +538,7 @@ expression
 // something that can be applied to unary operators
 unaryOperatorValidExpressions
   = applicationOrIndexOrAccessExpression
-  / function
+  / anonymousFunction
   / factor
   / StructLiteral
   / literal
@@ -548,7 +548,7 @@ unaryOperatorValidExpressions
 nonBinaryOperatorExpression
   = applicationOrIndexOrAccessExpression
   / unop
-  / function
+  / anonymousFunction
   / StructLiteral
   / literal
   / Identifier

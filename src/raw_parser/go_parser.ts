@@ -5872,7 +5872,7 @@ peg$parseoperableExpression() {
 // @ts-ignore
     if (s0 === peg$FAILED) {
 // @ts-ignore
-      s0 = peg$parsefunction();
+      s0 = peg$parseanonymousFunction();
 // @ts-ignore
       if (s0 === peg$FAILED) {
 // @ts-ignore
@@ -5913,7 +5913,7 @@ peg$parseexpression() {
 // @ts-ignore
         if (s0 === peg$FAILED) {
 // @ts-ignore
-          s0 = peg$parsefunction();
+          s0 = peg$parseanonymousFunction();
 // @ts-ignore
           if (s0 === peg$FAILED) {
 // @ts-ignore
@@ -5948,7 +5948,7 @@ peg$parseunaryOperatorValidExpressions() {
 // @ts-ignore
     if (s0 === peg$FAILED) {
 // @ts-ignore
-      s0 = peg$parsefunction();
+      s0 = peg$parseanonymousFunction();
 // @ts-ignore
       if (s0 === peg$FAILED) {
 // @ts-ignore
@@ -5990,7 +5990,7 @@ peg$parsenonBinaryOperatorExpression() {
 // @ts-ignore
       if (s0 === peg$FAILED) {
 // @ts-ignore
-        s0 = peg$parsefunction();
+        s0 = peg$parseanonymousFunction();
 // @ts-ignore
         if (s0 === peg$FAILED) {
 // @ts-ignore
@@ -9601,7 +9601,7 @@ export type ApplicationValueList = [
 export type ApplicationOrIndexOrAccessExpression = "[" | "(" | ".";
 export type OperableExpression =
   | Unop
-  | Function_1
+  | AnonymousFunction
   | Literal
   | StructLiteral
   | Identifier;
@@ -9609,13 +9609,13 @@ export type Expression =
   | LogicalBinop
   | Unop
   | ApplicationOrIndexOrAccessExpression
-  | Function_1
+  | AnonymousFunction
   | StructLiteral
   | Literal
   | Identifier;
 export type UnaryOperatorValidExpressions =
   | ApplicationOrIndexOrAccessExpression
-  | Function_1
+  | AnonymousFunction
   | Factor
   | StructLiteral
   | Literal
@@ -9623,7 +9623,7 @@ export type UnaryOperatorValidExpressions =
 export type NonBinaryOperatorExpression =
   | ApplicationOrIndexOrAccessExpression
   | Unop
-  | Function_1
+  | AnonymousFunction
   | StructLiteral
   | Literal
   | Identifier;
