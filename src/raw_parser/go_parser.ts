@@ -406,7 +406,7 @@ const peggyParser: {parse: any, SyntaxError: any, DefaultTracer?: any} = // @gen
 // @ts-ignore
       type_type: "function",
 // @ts-ignore
-      formal_values: formals,
+      formal_value: formals,
 // @ts-ignore
       return_value: ret
     })

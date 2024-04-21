@@ -243,7 +243,7 @@
   function makeFunctionType(formals, ret) {
   	return makeType({
       type_type: "function",
-      formal_values: formals,
+      formal_value: formals,
       return_value: ret
     })
   }

@@ -226,6 +226,18 @@ export class Type extends GoNode {
   }
 }
 
+export class AnyType extends Type {
+  constructor() {
+    super("any");
+  }
+}
+
+export class VoidType extends Type {
+  constructor() {
+    super("void");
+  }
+}
+
 export class BasicTypeClass extends Type {
   constructor(public type_value: BasicType) {
     super("basic");
@@ -240,7 +252,7 @@ export class TupleType extends Type {
 
 export class FunctionType extends Type {
   constructor(
-    public formal_values: Type[],
+    public formal_value: Type,
     public return_value: Type,
   ) {
     super("function");

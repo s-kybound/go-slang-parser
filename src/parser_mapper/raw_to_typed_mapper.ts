@@ -347,9 +347,9 @@ export function verifyNode(ast: any) {
     if (!isType(ast.return_value)) {
       throw new Error("Function return value must be a type");
     }
-    ast.formal_values.forEach(verifyNode);
-    if (ast.formal_values.some((node: any) => !isType(node))) {
-      throw new Error("Function formal values must be types");
+    verifyNode(ast.formal_value);
+    if (!isType(ast.formal_value)) {
+      throw new Error("Function formal values must be a type");
     }
   } else if (isChanType(ast)) {
     verifyNode(ast.chan_value_type);
@@ -494,7 +494,7 @@ export function convert(ast: any): GoNode {
     return new TupleType(ast.type_values.map(convert) as Type[]);
   } else if (isFunctionType(ast)) {
     return new FunctionType(
-      ast.formal_values.map(convert) as Type[],
+      convert(ast.formal_value) as Type,
       convert(ast.return_value) as Type,
     );
   } else if (isChanType(ast)) {
