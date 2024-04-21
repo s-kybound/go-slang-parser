@@ -494,7 +494,7 @@ export function convert(ast: any): GoNode {
     return new TupleType(ast.type_values.map(convert) as Type[]);
   } else if (isFunctionType(ast)) {
     return new FunctionType(
-      convert(ast.formal_value) as Type,
+      convert(ast.formal_value) as TupleType,
       convert(ast.return_value) as Type,
     );
   } else if (isChanType(ast)) {

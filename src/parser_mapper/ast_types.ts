@@ -252,7 +252,9 @@ export class TupleType extends Type {
 
 export class FunctionType extends Type {
   constructor(
-    public formal_value: Type,
+    // for ease of use, we use TupleType to represent the formals
+    public formal_value: TupleType,
+    // if multiple return values are also used, we use TupleType to represent them too
     public return_value: Type,
   ) {
     super("function");
