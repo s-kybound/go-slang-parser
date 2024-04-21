@@ -415,8 +415,8 @@ BasicType
   }
 
 TupleType
-  = _ "(" _ types:TypeList _ ")" _ { 
-    return makeTupleType(types);
+  = _ "(" _ types:TypeList? _ ")" _ { 
+    return makeTupleType(types ? types : []);
   }
 
 TypeList

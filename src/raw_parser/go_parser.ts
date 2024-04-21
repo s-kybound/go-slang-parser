@@ -1019,7 +1019,7 @@ return [head, ...tail]};// @ts-ignore
 
   var peg$f15 = function(types) { 
 // @ts-ignore
-    return makeTupleType(types);
+    return makeTupleType(types ? types : []);
   };// @ts-ignore
 
   var peg$f16 = function(head, tail) {// @ts-ignore
@@ -3728,37 +3728,33 @@ peg$parseTupleType() {
 // @ts-ignore
       s4 = peg$parseTypeList();
 // @ts-ignore
-      if (s4 !== peg$FAILED) {
+      if (s4 === peg$FAILED) {
 // @ts-ignore
-        s5 = peg$parse_();
+        s4 = null;
+      }
 // @ts-ignore
-        if (input.charCodeAt(peg$currPos) === 41) {
+      s5 = peg$parse_();
 // @ts-ignore
-          s6 = peg$c4;
+      if (input.charCodeAt(peg$currPos) === 41) {
 // @ts-ignore
-          peg$currPos++;
+        s6 = peg$c4;
 // @ts-ignore
-        } else {
+        peg$currPos++;
 // @ts-ignore
-          s6 = peg$FAILED;
+      } else {
 // @ts-ignore
-          if (peg$silentFails === 0) { peg$fail(peg$e4); }
-        }
+        s6 = peg$FAILED;
 // @ts-ignore
-        if (s6 !== peg$FAILED) {
+        if (peg$silentFails === 0) { peg$fail(peg$e4); }
+      }
 // @ts-ignore
-          s7 = peg$parse_();
+      if (s6 !== peg$FAILED) {
 // @ts-ignore
-          peg$savedPos = s0;
+        s7 = peg$parse_();
 // @ts-ignore
-          s0 = peg$f15(s4);
+        peg$savedPos = s0;
 // @ts-ignore
-        } else {
-// @ts-ignore
-          peg$currPos = s0;
-// @ts-ignore
-          s0 = peg$FAILED;
-        }
+        s0 = peg$f15(s4);
 // @ts-ignore
       } else {
 // @ts-ignore
